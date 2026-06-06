@@ -15,11 +15,11 @@ const PRIORITY_COLORS = {
 };
 
 async function apiFetch(url, options = {}) {
-  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || "";
+  const token = localStorage.getItem('auth_token') || '';
   const res = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
-      "X-CSRF-TOKEN": csrfToken,
+      "Authorization": `Bearer ${token}`,
       Accept: "application/json",
     },
     ...options,
@@ -141,7 +141,7 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
   );
 }
 
-export default function KanbanBoard() {
+export default function KanbanBoard({ user, onLogout }) {
   const [columns, setColumns] = useState({ todo: [], in_progress: [], done: [] });
   const [modal, setModal] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -181,6 +181,15 @@ export default function KanbanBoard() {
     loadTasks();
   }
 
+  async function handleLogout() {
+    try {
+      await apiFetch('/api/logout', { method: 'POST' });
+    } catch (e) {
+      // continue logout even if request fails
+    }
+    onLogout();
+  }
+
   function handleDragStart(e, task) {
     dragTask.current = task;
     e.dataTransfer.effectAllowed = "move";
@@ -213,26 +222,64 @@ export default function KanbanBoard() {
 
   return (
     <div style={{ fontFamily: "'Inter', system-ui, sans-serif", minHeight: "100vh", background: "#f3f4f6" }}>
+
+      {/* Header */}
       <div style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "18px 32px", display: "flex", alignItems: "center", gap: 16 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#111827" }}>📋 DailyMe</h1>
           <p style={{ margin: "3px 0 0", fontSize: 13, color: "#6b7280" }}>{totalDone}/{total} tasks completed · {progress}% done</p>
         </div>
         <div style={{ flex: 1 }} />
+
+        {/* Progress bar */}
         <div style={{ width: 140, height: 6, background: "#e5e7eb", borderRadius: 99 }}>
           <div style={{ height: "100%", borderRadius: 99, background: "#10b981", width: `${progress}%`, transition: "width .4s ease" }} />
         </div>
-        <button onClick={() => setModal({ task: null, defaultStatus: "todo" })} style={{ padding: "9px 20px", background: "#6366f1", color: "#fff", border: "none", borderRadius: 10, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>+ New Task</button>
+
+        {/* User avatar + name */}
+        {user && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: "50%", background: "#6366f1",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#fff", fontWeight: 700, fontSize: 13,
+            }}>
+              {user.name?.charAt(0).toUpperCase()}
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 500, color: "#374151" }}>{user.name}</span>
+          </div>
+        )}
+
+        <button
+          onClick={() => setModal({ task: null, defaultStatus: "todo" })}
+          style={{ padding: "9px 20px", background: "#6366f1", color: "#fff", border: "none", borderRadius: 10, cursor: "pointer", fontWeight: 600, fontSize: 14 }}
+        >
+          + New Task
+        </button>
+
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          style={{ padding: "9px 16px", background: "none", color: "#6b7280", border: "1px solid #e5e7eb", borderRadius: 10, cursor: "pointer", fontWeight: 500, fontSize: 13, transition: "all .15s" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#fee2e2"; e.currentTarget.style.color = "#dc2626"; e.currentTarget.style.borderColor = "#fca5a5"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#6b7280"; e.currentTarget.style.borderColor = "#e5e7eb"; }}
+        >
+          Logout
+        </button>
       </div>
+
       {error && (
         <div style={{ margin: 24, padding: 16, background: "#fee2e2", borderRadius: 10, color: "#991b1b", fontSize: 14 }}>⚠️ {error}</div>
       )}
+
+      {/* Board */}
       <div style={{ display: "flex", gap: 16, padding: "24px 32px", alignItems: "flex-start" }}>
         {COLUMNS.map((col) => (
           <KanbanColumn key={col.key} column={col} tasks={columns[col.key] || []} onDrop={handleDrop} onDragOver={handleDragOver} onDragStart={handleDragStart} onDelete={handleDelete} onEdit={(task) => setModal({ task })} onAddClick={(status) => setModal({ task: null, defaultStatus: status })} />
         ))}
       </div>
+
       {modal && <TaskModal task={modal.task} onSave={handleSave} onClose={() => setModal(null)} />}
     </div>
   );
-}
+} 
