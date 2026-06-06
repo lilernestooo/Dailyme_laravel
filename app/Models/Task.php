@@ -16,6 +16,11 @@ class Task extends Model
         'status',
         'order',
         'priority',
+        'completed_at',       // ← new
+    ];
+
+    protected $casts = [
+        'completed_at' => 'datetime',  // ← returns Carbon, serializes to ISO string
     ];
 
     public function user()

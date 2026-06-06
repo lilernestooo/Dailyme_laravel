@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 
 class TaskController extends Controller
 {
@@ -38,9 +39,10 @@ class TaskController extends Controller
 
         $task = Task::create([
             ...$validated,
-            'user_id' => $request->user()->id,
-            'status'  => $status,
-            'order'   => $maxOrder + 1,
+            'user_id'      => $request->user()->id,
+            'status'       => $status,
+            'order'        => $maxOrder + 1,
+            'completed_at' => $status === 'done' ? Carbon::now() : null, // ← new
         ]);
 
         return response()->json($task, 201);
@@ -54,7 +56,18 @@ class TaskController extends Controller
             'title'       => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'priority'    => 'in:low,medium,high',
+            'status'      => 'sometimes|in:todo,in_progress,done', // ← allow status change via modal
         ]);
+
+        // Stamp or clear completed_at when status changes via the Edit modal
+        if (isset($validated['status'])) {
+            $newStatus = $validated['status'];
+            if ($newStatus === 'done' && $task->status !== 'done') {
+                $validated['completed_at'] = Carbon::now();   // just became done
+            } elseif ($newStatus !== 'done' && $task->status === 'done') {
+                $validated['completed_at'] = null;            // moved away from done
+            }
+        }
 
         $task->update($validated);
 
@@ -86,7 +99,19 @@ class TaskController extends Controller
             }
         }
 
-        $task->update(['status' => $newStatus, 'order' => $newOrder]);
+        // Stamp or clear completed_at on drag-drop
+        $completedAt = $task->completed_at;
+        if ($newStatus === 'done' && $oldStatus !== 'done') {
+            $completedAt = Carbon::now();   // ← just dragged into Done
+        } elseif ($newStatus !== 'done' && $oldStatus === 'done') {
+            $completedAt = null;            // ← dragged out of Done
+        }
+
+        $task->update([
+            'status'       => $newStatus,
+            'order'        => $newOrder,
+            'completed_at' => $completedAt,  // ← new
+        ]);
 
         return response()->json($task);
     }

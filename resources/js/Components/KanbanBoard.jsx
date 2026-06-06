@@ -254,36 +254,55 @@ export default function KanbanBoard({ user, onLogout }) {
     ]);
   }
 
-  async function loadTasks() {
-    try {
-      const data = await apiFetch(API);
-      setColumns({ todo: data.todo || [], in_progress: data.in_progress || [], done: data.done || [] });
-    } catch {
-      setError("Could not load tasks. Is the Laravel server running?");
-    } finally {
-      setLoading(false);
-    }
+// AFTER
+async function loadTasks() {
+  try {
+    const data = await apiFetch(API);
+    setColumns({ todo: data.todo || [], in_progress: data.in_progress || [], done: data.done || [] });
+
+    // Seed history from DB on first load only (don't overwrite session additions)
+    setHistory((prev) => {
+      if (prev.length > 0) return prev; // already has session entries, skip
+      return (data.history || []).map((t) => ({
+        id:        t.id,
+        taskTitle: t.title,
+        priority:  t.priority,
+        from:      null,
+        at:        t.completed_at,
+      }));
+    });
+  } catch {
+    setError("Could not load tasks. Is the Laravel server running?");
+  } finally {
+    setLoading(false);
   }
+}
 
   useEffect(() => { loadTasks(); }, []);
 
-  async function handleSave(form) {
-    try {
-      if (modal.task) {
-        await apiFetch(`${API}/${modal.task.id}`, { method: "PUT", body: JSON.stringify(form) });
-        if (form.status === "done" && modal.task.status !== "done")
-          addHistory({ title: form.title, priority: form.priority, from: modal.task.status });
-      } else {
-        await apiFetch(API, { method: "POST", body: JSON.stringify(form) });
-        if (form.status === "done")
-          addHistory({ title: form.title, priority: form.priority, from: null });
+// AFTER
+async function handleSave(form) {
+  try {
+    if (modal.task) {
+      await apiFetch(`${API}/${modal.task.id}`, { method: "PUT", body: JSON.stringify(form) });
+      if (form.status === "done" && modal.task.status !== "done") {
+        // Task just became done via modal — add to history
+        addHistory({ title: form.title, priority: form.priority, from: modal.task.status });
+      } else if (form.status !== "done" && modal.task.status === "done") {
+        // Task moved away from done — remove from history
+        setHistory((prev) => prev.filter((h) => h.taskTitle !== modal.task.title));
       }
-      setModal(null);
-      loadTasks();
-    } catch {
-      alert("Failed to save task.");
+    } else {
+      await apiFetch(API, { method: "POST", body: JSON.stringify(form) });
+      if (form.status === "done")
+        addHistory({ title: form.title, priority: form.priority, from: null });
     }
+    setModal(null);
+    loadTasks();
+  } catch {
+    alert("Failed to save task.");
   }
+}
 
   async function handleDelete(id) {
     if (!confirm("Delete this task?")) return;
@@ -299,15 +318,24 @@ export default function KanbanBoard({ user, onLogout }) {
   function handleDragStart(e, task) { dragTask.current = task; e.dataTransfer.effectAllowed = "move"; }
   function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }
 
-  async function handleDrop(e, newStatus) {
-    e.preventDefault();
-    const task = dragTask.current;
-    if (!task || task.status === newStatus) return;
-    const targetLength = columns[newStatus]?.length ?? 0;
-    await apiFetch(`${API}/${task.id}/move`, { method: "PATCH", body: JSON.stringify({ status: newStatus, order: targetLength }) });
-    if (newStatus === "done") addHistory({ title: task.title, priority: task.priority, from: task.status });
-    loadTasks();
+// AFTER
+async function handleDrop(e, newStatus) {
+  e.preventDefault();
+  const task = dragTask.current;
+  if (!task || task.status === newStatus) return;
+  const targetLength = columns[newStatus]?.length ?? 0;
+  await apiFetch(`${API}/${task.id}/move`, { method: "PATCH", body: JSON.stringify({ status: newStatus, order: targetLength }) });
+
+  if (newStatus === "done") {
+    // Dragged into Done — add to history
+    addHistory({ title: task.title, priority: task.priority, from: task.status });
+  } else if (task.status === "done") {
+    // Dragged out of Done — remove from history
+    setHistory((prev) => prev.filter((h) => h.taskTitle !== task.title));
   }
+
+  loadTasks();
+}
 
   const allTasks  = Object.values(columns).flat();
   const totalDone = columns.done?.length ?? 0;
