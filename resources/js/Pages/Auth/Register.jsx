@@ -1,120 +1,76 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import React, { useState } from 'react';
 
-export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-    });
+export default function Register({ onRegister, onGoToLogin }) {
+  const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' });
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-    const submit = (e) => {
-        e.preventDefault();
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
-    };
+  async function handleSubmit() {
+    setLoading(true);
+    setError(null);
+    try {
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(Object.values(data.errors || {})[0]?.[0] || data.message || 'Registration failed');
+      localStorage.setItem('auth_token', data.token);
+      onRegister(data.user);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-    return (
-        <GuestLayout>
-            <Head title="Register" />
+  const inputStyle = {
+    width: '100%', padding: '10px 14px', borderRadius: 8,
+    border: '1px solid #e5e7eb', fontSize: 14, outline: 'none',
+    fontFamily: 'inherit', boxSizing: 'border-box',
+  };
+  const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6, marginTop: 16 };
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
+  return (
+    <div style={{ minHeight: '100vh', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <div style={{ background: '#fff', borderRadius: 20, padding: 40, width: 400, boxShadow: '0 4px 24px rgba(0,0,0,.08)', border: '1px solid #e5e7eb' }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ fontSize: 36, marginBottom: 8 }}>📋</div>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#111827' }}>DailyMe</h1>
+          <p style={{ margin: '6px 0 0', fontSize: 13, color: '#6b7280' }}>Create your account</p>
+        </div>
 
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                    />
+        {error && (
+          <div style={{ padding: '10px 14px', background: '#fee2e2', borderRadius: 8, color: '#991b1b', fontSize: 13, marginBottom: 16 }}>
+            ⚠️ {error}
+          </div>
+        )}
 
-                    <InputError message={errors.name} className="mt-2" />
-                </div>
+        <label style={labelStyle}>Name</label>
+        <input type="text" value={form.name} onChange={set('name')} placeholder="Your full name" style={inputStyle} />
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
+        <label style={labelStyle}>Email</label>
+        <input type="email" value={form.email} onChange={set('email')} placeholder="you@example.com" style={inputStyle} />
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                    />
+        <label style={labelStyle}>Password</label>
+        <input type="password" value={form.password} onChange={set('password')} placeholder="Min. 8 characters" style={inputStyle} />
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
+        <label style={labelStyle}>Confirm Password</label>
+        <input type="password" value={form.password_confirmation} onChange={set('password_confirmation')} placeholder="Repeat your password" style={inputStyle} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} />
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+        <button onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '11px 0', borderRadius: 10, border: 'none', background: loading ? '#c7d2fe' : '#6366f1', color: '#fff', fontWeight: 700, fontSize: 15, cursor: loading ? 'not-allowed' : 'pointer', marginTop: 24 }}>
+          {loading ? 'Creating account...' : 'Create Account'}
+        </button>
 
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        required
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
-    );
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#6b7280' }}>
+          Already have an account?{' '}
+          <span onClick={onGoToLogin} style={{ color: '#6366f1', fontWeight: 600, cursor: 'pointer' }}>Sign In</span>
+        </p>
+      </div>
+    </div>
+  );
 }
