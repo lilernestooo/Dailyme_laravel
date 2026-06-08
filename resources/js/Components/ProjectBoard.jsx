@@ -426,6 +426,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
   const [inviteModal, setInviteModal]   = useState(false);
   const [error, setError]               = useState(null);
   const [projectData, setProjectData]   = useState(project);
+  const [showMembers, setShowMembers]   = useState(false);
 
   const isOwner = project.is_owner || project.owner_id === user.id;
 
@@ -507,14 +508,55 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
           <div style={{ height: '100%', borderRadius: 99, background: '#10b981', width: `${progress}%`, transition: 'width .4s ease' }} />
         </div>
 
-        {/* Members avatars */}
-        <div style={{ display: 'flex' }}>
-          {members.slice(0, 5).map((m, i) => (
-            <div key={m.id} title={m.user?.name} style={{ width: 30, height: 30, borderRadius: '50%', background: '#6366f1', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 12, marginLeft: i > 0 ? -8 : 0 }}>
-              {m.user?.name?.charAt(0).toUpperCase()}
+            {/* Members avatars + dropdown */}
+            <div style={{ position: 'relative' }}>
+            <button
+                onClick={() => setShowMembers((v) => !v)}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: '1px solid #e5e7eb', borderRadius: 10, padding: '5px 10px', cursor: 'pointer' }}
+            >
+                <div style={{ display: 'flex' }}>
+                {members.slice(0, 4).map((m, i) => (
+                    <div key={m.id} title={m.user?.name} style={{ width: 26, height: 26, borderRadius: '50%', background: '#6366f1', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 11, marginLeft: i > 0 ? -8 : 0 }}>
+                    {m.user?.name?.charAt(0).toUpperCase()}
+                    </div>
+                ))}
+                {members.length > 4 && (
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#e5e7eb', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 700, fontSize: 10, marginLeft: -8 }}>
+                    +{members.length - 4}
+                    </div>
+                )}
+                </div>
+                <span style={{ fontSize: 12, color: '#6b7280', fontWeight: 500 }}>
+                {members.length} member{members.length !== 1 ? 's' : ''} ▾
+                </span>
+            </button>
+
+            {showMembers && (
+                <>
+                {/* Backdrop to close on outside click */}
+                <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMembers(false)} />
+                <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,.1)', minWidth: 220, zIndex: 100, overflow: 'hidden' }}>
+                    <div style={{ padding: '10px 14px', borderBottom: '1px solid #f3f4f6', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: '.06em', textTransform: 'uppercase' }}>
+                    Project Developers
+                    </div>
+                    {members.map((m) => (
+                    <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid #f9fafb' }}>
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: m.user?.id === projectData.owner_id ? '#6366f1' : '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: m.user?.id === projectData.owner_id ? '#fff' : '#6366f1', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                        {m.user?.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user?.name}</div>
+                        <div style={{ fontSize: 11, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user?.email}</div>
+                        </div>
+                        {m.user?.id === projectData.owner_id && (
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#eef2ff', color: '#6366f1', flexShrink: 0 }}>Owner</span>
+                        )}
+                    </div>
+                    ))}
+                </div>
+                </>
+            )}
             </div>
-          ))}
-        </div>
 
         {/* Owner actions */}
         {isOwner && (
