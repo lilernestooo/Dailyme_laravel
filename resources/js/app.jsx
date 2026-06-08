@@ -3,11 +3,15 @@ import { createRoot } from 'react-dom/client';
 import KanbanBoard from './Components/KanbanBoard';
 import Login from './Pages/Auth/Login';
 import Register from './Pages/Auth/Register';
+import ProjectList from './Components/ProjectList';
+import ProjectBoard from './Components/ProjectBoard';
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [page, setPage] = useState('login');
-  const [checking, setChecking] = useState(true);
+  const [user, setUser]             = useState(null);
+  const [page, setPage]             = useState('login');
+  const [checking, setChecking]     = useState(true);
+  const [view, setView]             = useState('daily');
+  const [activeProject, setActiveProject] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -27,6 +31,13 @@ function App() {
     localStorage.removeItem('auth_token');
     setUser(null);
     setPage('login');
+    setView('daily');
+    setActiveProject(null);
+  }
+
+  function openProject(project) {
+    setActiveProject(project);
+    setView('board');
   }
 
   if (checking) return (
@@ -36,11 +47,19 @@ function App() {
   );
 
   if (!user) {
-    if (page === 'register') return <Register onRegister={setUser} onGoToLogin={() => setPage('login')} />;
+    if (page === 'register') return <Register onRegister={() => setPage('login')} onGoToLogin={() => setPage('login')} />;
     return <Login onLogin={setUser} onGoToRegister={() => setPage('register')} />;
   }
 
-  return <KanbanBoard user={user} onLogout={handleLogout} />;
+  if (view === 'board' && activeProject) {
+    return <ProjectBoard project={activeProject} user={user} onBack={() => setView('projects')} onLogout={handleLogout} />;
+  }
+
+  if (view === 'projects') {
+    return <ProjectList user={user} onOpenProject={openProject} onGoToDaily={() => setView('daily')} onLogout={handleLogout} />;
+  }
+
+  return <KanbanBoard user={user} onLogout={handleLogout} onGoToProjects={() => setView('projects')} />;
 }
 
 const el = document.getElementById('app');
