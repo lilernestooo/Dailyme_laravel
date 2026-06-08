@@ -260,17 +260,13 @@ async function loadTasks() {
     const data = await apiFetch(API);
     setColumns({ todo: data.todo || [], in_progress: data.in_progress || [], done: data.done || [] });
 
-    // Seed history from DB on first load only (don't overwrite session additions)
-    setHistory((prev) => {
-      if (prev.length > 0) return prev; // already has session entries, skip
-      return (data.history || []).map((t) => ({
-        id:        t.id,
-        taskTitle: t.title,
-        priority:  t.priority,
-        from:      null,
-        at:        t.completed_at,
-      }));
-    });
+    setHistory((data.done || []).map((t) => ({
+      id:        t.id,
+      taskTitle: t.title,
+      priority:  t.priority,
+      from:      null,
+      at:        t.completed_at,
+    })));
   } catch {
     setError("Could not load tasks. Is the Laravel server running?");
   } finally {

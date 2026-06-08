@@ -542,7 +542,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
           onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.color = '#dc2626'; e.currentTarget.style.borderColor = '#fca5a5'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
         >
-          Logout
+          Signout
         </button>
       </div>
 
@@ -612,7 +612,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
           ticket={commentsModal}
           projectId={project.id}
           onClose={() => setCommentsModal(null)}
-          onReplied={() => { setCommentsModal(null); loadBoard(); }}
+          onReplied={() => { setCommentsModal(null); loadBoard(); }}    
         />
       )}
 

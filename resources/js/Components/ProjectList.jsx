@@ -99,16 +99,6 @@ export default function ProjectList({ user, onOpenProject, onGoToDaily, onLogout
         </div>
         <div style={{ flex: 1 }} />
 
-        {/* User avatar */}
-        {user && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13 }}>
-              {user.name?.charAt(0).toUpperCase()}
-            </div>
-            <span style={{ fontSize: 13, fontWeight: 500, color: '#374151' }}>{user.name}</span>
-          </div>
-        )}
-
         <button onClick={onGoToDaily} style={{ padding: '9px 16px', background: 'none', color: '#6b7280', border: '1px solid #e5e7eb', borderRadius: 10, cursor: 'pointer', fontWeight: 500, fontSize: 13 }}>
           📋 Daily Tasks
         </button>
@@ -117,12 +107,22 @@ export default function ProjectList({ user, onOpenProject, onGoToDaily, onLogout
           + New Project
         </button>
 
+        {/* User avatar */}
+         {user && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13 }}>
+              {user.name?.charAt(0).toUpperCase()}
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#374151' }}>{user.name}</span>
+          </div>
+        )}
+
         <button onClick={onLogout}
           style={{ padding: '9px 16px', background: 'none', color: '#6b7280', border: '1px solid #e5e7eb', borderRadius: 10, cursor: 'pointer', fontWeight: 500, fontSize: 13 }}
           onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.color = '#dc2626'; e.currentTarget.style.borderColor = '#fca5a5'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
         >
-          Logout
+          Signout
         </button>
       </div>
 
