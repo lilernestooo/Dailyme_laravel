@@ -238,7 +238,7 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
 }
 
 /* ─── Main Board ─────────────────────────────────────────────────────────── */
-export default function KanbanBoard({ user, onLogout }) {
+export default function KanbanBoard({ user, onLogout, onGoToProjects }) {
   const [columns, setColumns]         = useState({ todo: [], in_progress: [], done: [] });
   const [modal, setModal]             = useState(null);
   const [loading, setLoading]         = useState(true);
@@ -397,6 +397,16 @@ async function handleDrop(e, newStatus) {
           style={{ padding: "7px 13px", borderRadius: 8, border: showHistory ? "none" : "1px solid #fde8e8", background: showHistory ? "#fff5f5" : "#fff", color: showHistory ? "#FF2D20" : "#9ca3af", cursor: "pointer", fontWeight: 600, fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}
         >
           🕓 History {history.length > 0 && <span style={{ background: "#FF2D20", color: "#fff", borderRadius: 10, padding: "1px 5px", fontSize: 10 }}>{history.length}</span>}
+        </button>
+
+        {/* Projects */}
+        <button
+          onClick={() => onGoToProjects && onGoToProjects()}
+          style={{ padding: "7px 13px", borderRadius: 8, border: "1px solid #fde8e8", background: "#fff", color: "#9ca3af", cursor: "pointer", fontWeight: 600, fontSize: 12, display: "flex", alignItems: "center", gap: 5, transition: "all .15s" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.color = "#FF2D20"; e.currentTarget.style.borderColor = "#fca5a5"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.borderColor = "#fde8e8"; }}
+        >
+          🗂 Projects
         </button>
 
         {/* New task */}
