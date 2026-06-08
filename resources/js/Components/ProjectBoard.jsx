@@ -160,6 +160,132 @@ function ReviewModal({ ticket, projectId, onDone, onClose }) {
   );
 }
 
+// ─── Comments View Modal (read-only, for members) ─────────────────────────────
+// AFTER
+function CommentsModal({ ticket, projectId, onClose, onReplied }) {
+    const [reply, setReply] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+  
+    async function handleReply() {
+      if (!reply.trim()) return;
+      setLoading(true);
+      setError(null);
+      try {
+        await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}/comments`, {
+          method: 'POST',
+          body: JSON.stringify({ comment: reply, type: 'comment' }),
+        });
+        setReply('');
+        onReplied();
+      } catch (e) {
+        setError('Failed to send reply.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  
+    const TYPE_STYLES = {
+    approve: { bg: '#ecfdf5', border: '#6ee7b7', badge: '#10b981', label: 'Approved' },
+    reject:  { bg: '#fff1f2', border: '#fda4af', badge: '#ef4444', label: 'Rejected' },
+    comment: { bg: '#f8fafc', border: '#e2e8f0', badge: '#6b7280', label: 'Comment'  },
+  };
+
+  return (
+    <div
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}
+      onClick={onClose}
+    >
+      <div
+        style={{ background: '#fff', borderRadius: 16, padding: 28, width: 500, maxHeight: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,.25)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{ marginBottom: 16 }}>
+          <h2 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: '#111827' }}>💬 Comments</h2>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#374151' }}>{ticket.title}</p>
+          {ticket.description && (
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280', lineHeight: 1.5 }}>{ticket.description}</p>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: '#e5e7eb', marginBottom: 16 }} />
+
+        {/* Comments list */}
+        <div style={{ overflowY: 'auto', flex: 1 }}>
+          {!ticket.comments?.length ? (
+            <div style={{ textAlign: 'center', padding: '32px 0', color: '#9ca3af', fontSize: 14 }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>💬</div>
+              No comments yet
+            </div>
+          ) : (
+            ticket.comments.map((c) => {
+              const s = TYPE_STYLES[c.type] || TYPE_STYLES.comment;
+              return (
+                <div
+                  key={c.id}
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: 10,
+                    background: s.bg,
+                    border: `1px solid ${s.border}`,
+                    marginBottom: 10,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    {/* Avatar */}
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 11, flexShrink: 0 }}>
+                      {c.user?.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{c.user?.name}</span>
+                    {/* Type badge */}
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: s.badge, color: '#fff', fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', marginLeft: 'auto' }}>
+                      {s.label}
+                    </span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: 13, color: '#374151', lineHeight: 1.6 }}>{c.comment}</p>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+{/* Footer — reply box */}
+<div style={{ marginTop: 16, borderTop: '1px solid #e5e7eb', paddingTop: 16 }}>
+          {error && (
+            <div style={{ padding: '8px 12px', background: '#fee2e2', borderRadius: 8, color: '#991b1b', fontSize: 12, marginBottom: 10 }}>
+              ⚠️ {error}
+            </div>
+          )}
+          <textarea
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            placeholder="Write a reply to the owner's feedback..."
+            rows={3}
+            style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 13, fontFamily: 'inherit', boxSizing: 'border-box', resize: 'vertical', outline: 'none' }}
+          />
+          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <button
+              onClick={onClose}
+              style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontWeight: 500, color: '#374151', fontSize: 13 }}
+            >
+              Close
+            </button>
+            <button
+              onClick={handleReply}
+              disabled={loading || !reply.trim()}
+              style={{ flex: 2, padding: '9px 0', borderRadius: 8, border: 'none', background: reply.trim() ? '#6366f1' : '#c7d2fe', color: '#fff', cursor: reply.trim() ? 'pointer' : 'not-allowed', fontWeight: 600, fontSize: 13 }}
+            >
+              {loading ? 'Sending...' : '↩ Send Reply'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Invite Modal ─────────────────────────────────────────────────────────────
 function InviteModal({ projectId, onDone, onClose }) {
   const [email, setEmail]   = useState('');
@@ -212,12 +338,11 @@ function InviteModal({ projectId, onDone, onClose }) {
 }
 
 // ─── Ticket Card ──────────────────────────────────────────────────────────────
-function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, onMove, currentColumn }) {
+function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, onMove, onViewComments, currentColumn }) {
   const p = PRIORITY_COLORS[ticket.priority] || PRIORITY_COLORS.medium;
 
   // What moves are allowed
   const memberMoves = { todo: 'in_progress', in_progress: 'review' };
-  const ownerMoves  = { review: ['done', 'in_progress'], done: ['archived'] };
 
   return (
     <div style={{ background: '#fff', borderRadius: 12, padding: '14px 16px', marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,.08)', border: '1px solid #e5e7eb' }}>
@@ -248,11 +373,19 @@ function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, on
         </div>
       )}
 
-      {/* Comments count */}
+      {/* Comments count — clickable for everyone */}
       {ticket.comments?.length > 0 && (
-        <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
-          💬 {ticket.comments.length} comment{ticket.comments.length !== 1 ? 's' : ''}
-        </div>
+        <button
+          onClick={() => onViewComments(ticket)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 4,
+            background: '#f0f4ff', border: '1px solid #c7d2fe',
+            borderRadius: 6, padding: '3px 10px', marginBottom: 10,
+            cursor: 'pointer', fontSize: 11, color: '#4f46e5', fontWeight: 600,
+          }}
+        >
+          💬 {ticket.comments.length} comment{ticket.comments.length !== 1 ? 's' : ''} — view
+        </button>
       )}
 
       {/* Action buttons */}
@@ -284,14 +417,15 @@ function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, on
 
 // ─── Main ProjectBoard ────────────────────────────────────────────────────────
 export default function ProjectBoard({ project, user, onBack, onLogout }) {
-  const [columns, setColumns]       = useState({ todo: [], in_progress: [], review: [], done: [], archived: [] });
-  const [members, setMembers]       = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [ticketModal, setTicketModal] = useState(null);
-  const [reviewModal, setReviewModal] = useState(null);
-  const [inviteModal, setInviteModal] = useState(false);
-  const [error, setError]           = useState(null);
-  const [projectData, setProjectData] = useState(project);
+  const [columns, setColumns]           = useState({ todo: [], in_progress: [], review: [], done: [], archived: [] });
+  const [members, setMembers]           = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [ticketModal, setTicketModal]   = useState(null);
+  const [reviewModal, setReviewModal]   = useState(null);
+  const [commentsModal, setCommentsModal] = useState(null); // ← NEW
+  const [inviteModal, setInviteModal]   = useState(false);
+  const [error, setError]               = useState(null);
+  const [projectData, setProjectData]   = useState(project);
 
   const isOwner = project.is_owner || project.owner_id === user.id;
 
@@ -446,6 +580,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
                   onDelete={handleDelete}
                   onReview={(t) => setReviewModal(t)}
                   onMove={handleMove}
+                  onViewComments={(t) => setCommentsModal(t)}  // ← NEW
                 />
               ))}
             </div>
@@ -469,6 +604,15 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
           projectId={project.id}
           onDone={() => { setReviewModal(null); loadBoard(); }}
           onClose={() => setReviewModal(null)}
+        />
+      )}
+
+        {commentsModal && (
+        <CommentsModal
+          ticket={commentsModal}
+          projectId={project.id}
+          onClose={() => setCommentsModal(null)}
+          onReplied={() => { setCommentsModal(null); loadBoard(); }}
         />
       )}
 
