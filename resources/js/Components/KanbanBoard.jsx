@@ -142,8 +142,7 @@ function TaskModal({ task, defaultStatus, onSave, onClose }) {
 
   return (
     <div
-      style={{ position: "fixed", inset: 0, background: "rgba(30,27,75,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}
-      onClick={onClose}
+    style={{ position: "fixed", inset: 0, background: "rgba(107,114,128,.35)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}
     >
       <div
         style={{ background: P.white, borderRadius: 20, padding: 32, width: 460, maxWidth: "94vw", boxShadow: "0 8px 40px rgba(124,58,237,.12)", border: `1px solid ${P.purple200}` }}
@@ -186,13 +185,17 @@ function TaskModal({ task, defaultStatus, onSave, onClose }) {
         </div>
 
         <div style={{ display: "flex", gap: 10, marginTop: 28 }}>
-          <button onClick={onClose}
-            style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: "pointer", fontWeight: 600, color: P.textSecondary, fontSize: 14 }}>
+        <button onClick={onClose}
+            style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: "pointer", fontWeight: 600, color: P.textSecondary, fontSize: 14, transition: "all .15s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; e.currentTarget.style.color = P.purple600; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = P.white; e.currentTarget.style.borderColor = P.border; e.currentTarget.style.color = P.textSecondary; }}>
             Cancel
           </button>
           <button
             onClick={() => valid && onSave(form)}
-            style={{ flex: 2, padding: "11px 0", borderRadius: 12, border: "none", background: valid ? P.purple600 : P.purple300, color: "#fff", cursor: valid ? "pointer" : "not-allowed", fontWeight: 700, fontSize: 14, boxShadow: valid ? `0 4px 16px rgba(124,58,237,.3)` : "none", transition: "all .2s" }}>
+            style={{ flex: 2, padding: "11px 0", borderRadius: 12, border: "none", background: valid ? P.purple600 : P.purple300, color: "#fff", cursor: valid ? "pointer" : "not-allowed", fontWeight: 700, fontSize: 14, boxShadow: valid ? `0 4px 16px rgba(124,58,237,.3)` : "none", transition: "all .2s" }}
+            onMouseEnter={(e) => { if (valid) e.currentTarget.style.background = P.purple700; }}
+            onMouseLeave={(e) => { if (valid) e.currentTarget.style.background = P.purple600; }}>
             {task ? "Save Changes" : "Create Task"}
           </button>
         </div>
@@ -235,10 +238,14 @@ function TaskRow({ task, onEdit, onDelete, onDragStart }) {
       </td>
       <td style={{ padding: "11px 14px 11px 8px", whiteSpace: "nowrap" }}>
         <div style={{ display: "flex", gap: 2, opacity: hover ? 1 : 0, transition: "opacity .15s" }}>
-          <button onClick={() => onEdit(task)} title="Edit"
-            style={{ background: P.purple100, border: "none", cursor: "pointer", borderRadius: 6, padding: "4px 7px", fontSize: 12, color: P.purple600 }}>✏️</button>
+        <button onClick={() => onEdit(task)} title="Edit"
+            style={{ background: P.purple100, border: "none", cursor: "pointer", borderRadius: 6, padding: "4px 7px", color: P.purple600, display: "flex", alignItems: "center" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
           <button onClick={() => onDelete(task.id)} title="Delete"
-            style={{ background: "#fee2e2", border: "none", cursor: "pointer", borderRadius: 6, padding: "4px 7px", fontSize: 12, color: "#dc2626" }}>🗑</button>
+            style={{ background: "#fee2e2", border: "none", cursor: "pointer", borderRadius: 6, padding: "4px 7px", color: "#dc2626", display: "flex", alignItems: "center" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
         </div>
       </td>
     </tr>
@@ -281,7 +288,9 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
       <div style={{ overflowY: "auto", flex: 1, minHeight: 120, maxHeight: 480 }}>
         {tasks.length === 0 ? (
           <div style={{ margin: 14, border: `2px dashed ${column.border}`, borderRadius: 10, padding: "26px 0", textAlign: "center", color: P.textMuted, fontSize: 12.5 }}>
-            <div style={{ fontSize: 22, marginBottom: 5 }}>📭</div>
+            <div style={{ marginBottom: 5, display: "flex", justifyContent: "center", color: P.textMuted }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            </div>
             Drop tasks here
           </div>
         ) : (
