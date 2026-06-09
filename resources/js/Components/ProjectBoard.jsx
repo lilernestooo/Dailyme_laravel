@@ -2,13 +2,171 @@ import React, { useState, useEffect } from 'react';
 import NotificationBell from './NotificationBell';
 import TicketDetail from './TicketDetail';
 
+// ── Palette (matches KanbanBoard exactly) ─────────────────────────────────
+const P = {
+  purple50:  '#f5f3ff',
+  purple100: '#ede9fe',
+  purple200: '#ddd6fe',
+  purple300: '#c4b5fd',
+  purple400: '#a78bfa',
+  purple500: '#8b5cf6',
+  purple600: '#7c3aed',
+  purple700: '#6d28d9',
+  textPrimary:   '#1e1b4b',
+  textSecondary: '#6b7280',
+  textMuted:     '#9ca3af',
+  border:        '#ede9fe',
+  borderMid:     '#c4b5fd',
+  white:         '#ffffff',
+  bg:            '#faf9ff',
+};
+
+// ── Laravel Flame Logo (matches KanbanBoard) ───────────────────────────────
+function LaravelLogo({ size = 28 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 50 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M49.626 11.564a.809.809 0 0 1 .028.209v10.250c0 .348-.188.670-.491.844l-8.610 4.968v9.836c0 .348-.188.670-.491.844l-17.953 10.356a.817.817 0 0 1-.114.050c-.013.005-.028.009-.042.012a.786.786 0 0 1-.213.028.786.786 0 0 1-.213-.028c-.016-.003-.030-.007-.045-.013a.818.818 0 0 1-.114-.049L.491 38.515A.981.981 0 0 1 0 37.671V6.885c0-.070.008-.140.028-.208.006-.020.015-.039.024-.059a.807.807 0 0 1 .068-.124c.012-.018.026-.035.040-.051a.809.809 0 0 1 .098-.091c.016-.013.031-.025.048-.035L9.310.192a.981.981 0 0 1 .981 0l9.025 5.208a.817.817 0 0 1 .049.031.808.808 0 0 1 .098.091.748.748 0 0 1 .040.051.826.826 0 0 1 .067.124c.010.020.018.039.025.059.019.068.028.138.028.208v19.420l7.491-4.324V11.773c0-.070.009-.140.028-.208.006-.020.015-.039.025-.059a.826.826 0 0 1 .067-.124.748.748 0 0 1 .040-.051.808.808 0 0 1 .098-.091.817.817 0 0 1 .049-.031l9.025-5.208a.981.981 0 0 1 .981 0l9.025 5.208c.017.010.033.022.049.035a.809.809 0 0 1 .098.091c.014.016.028.033.040.051a.826.826 0 0 1 .068.124c.009.020.018.039.023.059z" fill="#7c3aed"/>
+      <path d="M48.062 21.816l-7.491 4.324V16.308l7.491-4.324v9.832zM39.589 37.093L22.618 26.947v-9.836l16.971 9.836v10.146zM9.800 1.554L1.327 6.470 9.800 11.386l8.473-4.916L9.800 1.554zM1.327 7.832v29.430l16.971 9.800V17.230L1.327 7.832zM9.800 12.748v19.420l7.491-4.324V8.424L9.800 12.748z" fill="#7c3aed" opacity=".35"/>
+    </svg>
+  );
+}
+
+// ── SVG Icons ──────────────────────────────────────────────────────────────
+const Icons = {
+  ArrowLeft: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5M12 5l-7 7 7 7"/>
+    </svg>
+  ),
+  Edit: () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  ),
+  Trash: () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6"/>
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+    </svg>
+  ),
+  Users: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  ),
+  UserPlus: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="8.5" cy="7" r="4"/>
+      <line x1="20" y1="8" x2="20" y2="14"/>
+      <line x1="23" y1="11" x2="17" y2="11"/>
+    </svg>
+  ),
+  Plus: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  ),
+  MessageSquare: () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+  ),
+  ClipboardCheck: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+      <rect x="9" y="3" width="6" height="4" rx="1" ry="1"/>
+      <path d="M9 12l2 2 4-4"/>
+    </svg>
+  ),
+  Archive: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="21 8 21 21 3 21 3 8"/>
+      <rect x="1" y="3" width="22" height="5"/>
+      <line x1="10" y1="12" x2="14" y2="12"/>
+    </svg>
+  ),
+  ArrowRight: () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"/>
+      <polyline points="12 5 19 12 12 19"/>
+    </svg>
+  ),
+  LogOut: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+  ),
+  Mail: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+  ),
+  Check: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  ),
+  X: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  ),
+  Reply: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 17 4 12 9 7"/>
+      <path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
+    </svg>
+  ),
+  Crown: () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/>
+      <path d="M5 20h14"/>
+    </svg>
+  ),
+  Ticket: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
+    </svg>
+  ),
+  Inbox: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 12h-6l-2 3h-4l-2-3H2"/>
+      <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+    </svg>
+  ),
+};
+
+const COLUMNS = [
+  { key: 'todo',        label: 'To Do',       color: P.purple600,  light: P.purple50,  dot: P.purple400,  border: P.purple200 },
+  { key: 'in_progress', label: 'In Progress',  color: '#0ea5e9',    light: '#f0f9ff',   dot: '#38bdf8',    border: '#bae6fd'   },
+  { key: 'review',      label: 'Review',       color: '#8b5cf6',    light: '#f5f3ff',   dot: '#a78bfa',    border: '#ddd6fe'   },
+  { key: 'done',        label: 'Done',         color: '#10b981',    light: '#ecfdf5',   dot: '#34d399',    border: '#a7f3d0'   },
+  { key: 'archived',    label: 'Archived',     color: '#6b7280',    light: '#f9fafb',   dot: '#9ca3af',    border: '#e5e7eb'   },
+];
+
+const PRIORITY = {
+  low:    { label: 'Low',    text: '#065f46', bg: '#d1fae5', dot: '#34d399' },
+  medium: { label: 'Medium', text: '#92400e', bg: '#fef3c7', dot: '#fbbf24' },
+  high:   { label: 'High',   text: '#991b1b', bg: '#fee2e2', dot: '#f87171' },
+};
+
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem('auth_token') || '';
   const res = await fetch(url, {
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-      Accept: "application/json",
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      Accept: 'application/json',
     },
     ...options,
   });
@@ -16,21 +174,23 @@ async function apiFetch(url, options = {}) {
   return res.json();
 }
 
-const COLUMNS = [
-  { key: 'todo',        label: 'To Do',       color: '#6366f1', bg: '#eef2ff' },
-  { key: 'in_progress', label: 'In Progress',  color: '#f59e0b', bg: '#fffbeb' },
-  { key: 'review',      label: 'Review',       color: '#8b5cf6', bg: '#f5f3ff' },
-  { key: 'done',        label: 'Done',         color: '#10b981', bg: '#ecfdf5' },
-  { key: 'archived',    label: 'Archived',     color: '#6b7280', bg: '#f9fafb' },
-];
+// ── Tooltip ────────────────────────────────────────────────────────────────
+function Tooltip({ label, children }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ position: 'relative', display: 'inline-flex' }} onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      {children}
+      {show && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: '50%', transform: 'translateX(-50%)', background: P.textPrimary, color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, whiteSpace: 'nowrap', pointerEvents: 'none', letterSpacing: '.03em', zIndex: 9999 }}>
+          {label}
+          <div style={{ position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)', borderWidth: 4, borderStyle: 'solid', borderColor: `transparent transparent ${P.textPrimary} transparent` }} />
+        </div>
+      )}
+    </div>
+  );
+}
 
-const PRIORITY_COLORS = {
-  low:    { text: '#059669', bg: '#d1fae5' },
-  medium: { text: '#d97706', bg: '#fef3c7' },
-  high:   { text: '#dc2626', bg: '#fee2e2' },
-};
-
-// ─── Ticket Modal (Create/Edit) ───────────────────────────────────────────────
+// ── Ticket Modal ───────────────────────────────────────────────────────────
 function TicketModal({ ticket, members, onSave, onClose }) {
   const [form, setForm] = useState({
     title:       ticket?.title       || '',
@@ -40,41 +200,57 @@ function TicketModal({ ticket, members, onSave, onClose }) {
   });
   const [loading, setLoading] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const valid = form.title.trim().length > 0;
 
-  const inputStyle = { width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' };
-  const labelStyle = { display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6, marginTop: 14 };
+  const field = {
+    width: '100%', padding: '10px 14px', borderRadius: 10,
+    border: `1.5px solid ${P.border}`, fontSize: 14, outline: 'none',
+    fontFamily: 'inherit', boxSizing: 'border-box', color: P.textPrimary,
+    background: P.purple50, transition: 'border-color .15s, box-shadow .15s',
+  };
+  const focusIn  = (e) => { e.target.style.borderColor = P.purple500; e.target.style.boxShadow = `0 0 0 3px ${P.purple100}`; };
+  const focusOut = (e) => { e.target.style.borderColor = P.border; e.target.style.boxShadow = 'none'; };
+  const lbl = { display: 'block', fontSize: 11, fontWeight: 700, color: P.textSecondary, marginBottom: 6, marginTop: 16, textTransform: 'uppercase', letterSpacing: '.06em' };
 
   async function handleSave() {
-    if (!form.title.trim()) return;
+    if (!valid) return;
     setLoading(true);
     await onSave({ ...form, assigned_to: form.assigned_to || null });
     setLoading(false);
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: 480, boxShadow: '0 20px 60px rgba(0,0,0,.2)', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
-        <h2 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: '#111827' }}>{ticket ? 'Edit Ticket' : 'New Ticket'}</h2>
-        <p style={{ margin: '0 0 8px', fontSize: 13, color: '#6b7280' }}>Fill in the ticket details and assign a member</p>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(107,114,128,.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+      <div style={{ background: P.white, borderRadius: 20, padding: 32, width: 480, maxWidth: '94vw', boxShadow: '0 8px 40px rgba(124,58,237,.12)', border: `1px solid ${P.purple200}` }} onClick={(e) => e.stopPropagation()}>
 
-        <label style={labelStyle}>Title *</label>
-        <input value={form.title} onChange={set('title')} placeholder="What needs to be done?" style={inputStyle} autoFocus />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${P.purple200}` }}>
+            <Icons.Ticket />
+          </div>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: '-.02em' }}>{ticket ? 'Edit Ticket' : 'New Ticket'}</h2>
+            <p style={{ margin: 0, fontSize: 12, color: P.textMuted }}>{ticket ? 'Update ticket details' : 'Add a ticket to the board'}</p>
+          </div>
+        </div>
 
-        <label style={labelStyle}>Description</label>
-        <textarea value={form.description} onChange={set('description')} placeholder="Describe the task in detail..." rows={4} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} />
+        <label style={lbl}>Title *</label>
+        <input value={form.title} onChange={set('title')} placeholder="What needs to be done?" style={field} onFocus={focusIn} onBlur={focusOut} autoFocus />
+
+        <label style={lbl}>Description</label>
+        <textarea value={form.description} onChange={set('description')} placeholder="Add details…" rows={3} style={{ ...field, resize: 'vertical' }} onFocus={focusIn} onBlur={focusOut} />
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
-            <label style={labelStyle}>Priority</label>
-            <select value={form.priority} onChange={set('priority')} style={inputStyle}>
-              <option value="low">🟢 Low</option>
-              <option value="medium">🟡 Medium</option>
-              <option value="high">🔴 High</option>
+            <label style={lbl}>Priority</label>
+            <select value={form.priority} onChange={set('priority')} style={field} onFocus={focusIn} onBlur={focusOut}>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
             </select>
           </div>
           <div>
-            <label style={labelStyle}>Assign To</label>
-            <select value={form.assigned_to} onChange={set('assigned_to')} style={inputStyle}>
+            <label style={lbl}>Assign To</label>
+            <select value={form.assigned_to} onChange={set('assigned_to')} style={field} onFocus={focusIn} onBlur={focusOut}>
               <option value="">Unassigned</option>
               {members.map((m) => (
                 <option key={m.user.id} value={m.user.id}>{m.user.name}</option>
@@ -83,10 +259,20 @@ function TicketModal({ ticket, members, onSave, onClose }) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontWeight: 500, color: '#374151', fontSize: 14 }}>Cancel</button>
-          <button onClick={handleSave} disabled={loading || !form.title.trim()} style={{ flex: 2, padding: '10px 0', borderRadius: 8, border: 'none', background: form.title.trim() ? '#6366f1' : '#c7d2fe', color: '#fff', cursor: form.title.trim() ? 'pointer' : 'not-allowed', fontWeight: 600, fontSize: 14 }}>
-            {loading ? 'Saving...' : ticket ? 'Save Changes' : 'Create Ticket'}
+        <div style={{ display: 'flex', gap: 10, marginTop: 28 }}>
+          <button onClick={onClose}
+            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: 'pointer', fontWeight: 600, color: P.textSecondary, fontSize: 14, transition: 'all .15s' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; e.currentTarget.style.color = P.purple600; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = P.white; e.currentTarget.style.borderColor = P.border; e.currentTarget.style.color = P.textSecondary; }}>
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={loading || !valid}
+            style={{ flex: 2, padding: '11px 0', borderRadius: 12, border: 'none', background: valid ? P.purple600 : P.purple300, color: '#fff', cursor: valid ? 'pointer' : 'not-allowed', fontWeight: 700, fontSize: 14, boxShadow: valid ? '0 4px 16px rgba(124,58,237,.3)' : 'none', transition: 'all .2s' }}
+            onMouseEnter={(e) => { if (valid) e.currentTarget.style.background = P.purple700; }}
+            onMouseLeave={(e) => { if (valid) e.currentTarget.style.background = P.purple600; }}>
+            {loading ? 'Saving…' : ticket ? 'Save Changes' : 'Create Ticket'}
           </button>
         </div>
       </div>
@@ -94,10 +280,13 @@ function TicketModal({ ticket, members, onSave, onClose }) {
   );
 }
 
-// ─── Review Modal (Approve/Reject with comment) ───────────────────────────────
+// ── Review Modal ───────────────────────────────────────────────────────────
 function ReviewModal({ ticket, projectId, onDone, onClose }) {
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const field = { width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: P.textPrimary, background: P.purple50 };
+  const lbl = { display: 'block', fontSize: 11, fontWeight: 700, color: P.textSecondary, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.06em' };
 
   async function handleAction(type) {
     if (!comment.trim()) { alert('Please leave a comment.'); return; }
@@ -108,53 +297,74 @@ function ReviewModal({ ticket, projectId, onDone, onClose }) {
         body: JSON.stringify({ comment, type }),
       });
       onDone();
-    } catch (e) {
+    } catch {
       alert('Failed to submit review.');
     } finally {
       setLoading(false);
     }
   }
 
+  const TYPE_STYLES = {
+    approve: { bg: '#ecfdf5', border: '#a7f3d0', badge: '#10b981', label: 'Approved' },
+    reject:  { bg: '#fef2f2', border: '#fecaca', badge: '#ef4444', label: 'Rejected' },
+    comment: { bg: P.purple50, border: P.purple200, badge: P.purple500, label: 'Comment' },
+  };
+
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: 480, boxShadow: '0 20px 60px rgba(0,0,0,.2)' }} onClick={(e) => e.stopPropagation()}>
-        <h2 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: '#111827' }}>📋 Review Ticket</h2>
-        <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 600, color: '#374151' }}>{ticket.title}</p>
-        <p style={{ margin: '0 0 20px', fontSize: 13, color: '#6b7280' }}>{ticket.description}</p>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(107,114,128,.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
+      <div style={{ background: P.white, borderRadius: 20, padding: 32, width: 500, maxWidth: '94vw', boxShadow: '0 8px 40px rgba(124,58,237,.12)', border: `1px solid ${P.purple200}` }} onClick={(e) => e.stopPropagation()}>
 
-        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Your Review Comment *</label>
-        <textarea
-          value={comment} onChange={(e) => setComment(e.target.value)}
-          placeholder="Leave feedback for the developer..."
-          rows={4}
-          style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', resize: 'vertical' }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${P.purple200}`, color: P.purple600 }}>
+            <Icons.ClipboardCheck />
+          </div>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: '-.02em' }}>Review Ticket</h2>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: P.textSecondary }}>{ticket.title}</p>
+          </div>
+        </div>
 
-        {/* Previous comments */}
+        {ticket.description && <p style={{ margin: '0 0 20px', fontSize: 13, color: P.textMuted, lineHeight: 1.6, padding: '10px 14px', background: P.purple50, borderRadius: 10, border: `1px solid ${P.border}` }}>{ticket.description}</p>}
+
         {ticket.comments?.length > 0 && (
-          <div style={{ marginTop: 16, maxHeight: 160, overflowY: 'auto' }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', margin: '0 0 8px' }}>PREVIOUS COMMENTS</p>
-            {ticket.comments.map((c) => (
-              <div key={c.id} style={{ padding: '8px 12px', borderRadius: 8, background: c.type === 'approve' ? '#ecfdf5' : c.type === 'reject' ? '#fee2e2' : '#f9fafb', marginBottom: 6, border: '1px solid #e5e7eb' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#374151' }}>{c.user?.name}</span>
-                  <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 10, background: c.type === 'approve' ? '#10b981' : c.type === 'reject' ? '#ef4444' : '#6b7280', color: '#fff', fontWeight: 600 }}>
-                    {c.type}
-                  </span>
+          <div style={{ marginBottom: 20, maxHeight: 180, overflowY: 'auto' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: P.textMuted, margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '.06em' }}>Previous Comments</p>
+            {ticket.comments.map((c) => {
+              const s = TYPE_STYLES[c.type] || TYPE_STYLES.comment;
+              return (
+                <div key={c.id} style={{ padding: '10px 14px', borderRadius: 10, background: s.bg, border: `1px solid ${s.border}`, marginBottom: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: P.purple500, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 10 }}>{c.user?.name?.charAt(0).toUpperCase()}</div>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: P.textPrimary }}>{c.user?.name}</span>
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: s.badge, color: '#fff', fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', marginLeft: 'auto' }}>{s.label}</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: 13, color: P.textSecondary, lineHeight: 1.5 }}>{c.comment}</p>
                 </div>
-                <p style={{ margin: 0, fontSize: 13, color: '#374151' }}>{c.comment}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
+        <label style={lbl}>Your Review Comment *</label>
+        <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Leave feedback for the developer…" rows={4} style={{ ...field, resize: 'vertical' }} />
+
         <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontWeight: 500, color: '#374151', fontSize: 14 }}>Cancel</button>
-          <button onClick={() => handleAction('reject')} disabled={loading} style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: 'none', background: '#fee2e2', color: '#dc2626', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            ✗ Reject
+          <button onClick={onClose} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: 'pointer', fontWeight: 600, color: P.textSecondary, fontSize: 14 }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = P.white; e.currentTarget.style.borderColor = P.border; }}>
+            Cancel
           </button>
-          <button onClick={() => handleAction('approve')} disabled={loading} style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: 'none', background: '#10b981', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            ✓ Approve
+          <button onClick={() => handleAction('reject')} disabled={loading}
+            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#fee2e2', color: '#dc2626', cursor: 'pointer', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#fecaca'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}>
+            <Icons.X /> Reject
+          </button>
+          <button onClick={() => handleAction('approve')} disabled={loading}
+            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#d1fae5', color: '#065f46', cursor: 'pointer', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#a7f3d0'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#d1fae5'}>
+            <Icons.Check /> Approve
           </button>
         </div>
       </div>
@@ -162,124 +372,96 @@ function ReviewModal({ ticket, projectId, onDone, onClose }) {
   );
 }
 
-// ─── Comments View Modal (read-only, for members) ─────────────────────────────
-// AFTER
+// ── Comments Modal ─────────────────────────────────────────────────────────
 function CommentsModal({ ticket, projectId, onClose, onReplied }) {
-    const [reply, setReply] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-  
-    async function handleReply() {
-      if (!reply.trim()) return;
-      setLoading(true);
-      setError(null);
-      try {
-        await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}/comments`, {
-          method: 'POST',
-          body: JSON.stringify({ comment: reply, type: 'comment' }),
-        });
-        setReply('');
-        onReplied();
-      } catch (e) {
-        setError('Failed to send reply.');
-      } finally {
-        setLoading(false);
-      }
+  const [reply, setReply] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function handleReply() {
+    if (!reply.trim()) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ comment: reply, type: 'comment' }),
+      });
+      setReply('');
+      onReplied();
+    } catch {
+      setError('Failed to send reply.');
+    } finally {
+      setLoading(false);
     }
-  
-    const TYPE_STYLES = {
-    approve: { bg: '#ecfdf5', border: '#6ee7b7', badge: '#10b981', label: 'Approved' },
-    reject:  { bg: '#fff1f2', border: '#fda4af', badge: '#ef4444', label: 'Rejected' },
-    comment: { bg: '#f8fafc', border: '#e2e8f0', badge: '#6b7280', label: 'Comment'  },
+  }
+
+  const TYPE_STYLES = {
+    approve: { bg: '#ecfdf5', border: '#a7f3d0', badge: '#10b981', label: 'Approved' },
+    reject:  { bg: '#fef2f2', border: '#fecaca', badge: '#ef4444', label: 'Rejected' },
+    comment: { bg: P.purple50, border: P.purple200, badge: P.purple500, label: 'Comment' },
   };
 
+  const field = { width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 13, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', background: P.purple50, color: P.textPrimary, resize: 'vertical' };
+
   return (
-    <div
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}
-      onClick={onClose}
-    >
-      <div
-        style={{ background: '#fff', borderRadius: 16, padding: 28, width: 500, maxHeight: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,.25)' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div style={{ marginBottom: 16 }}>
-          <h2 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: '#111827' }}>💬 Comments</h2>
-          <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#374151' }}>{ticket.title}</p>
-          {ticket.description && (
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280', lineHeight: 1.5 }}>{ticket.description}</p>
-          )}
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(107,114,128,.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
+      <div style={{ background: P.white, borderRadius: 20, padding: 32, width: 520, maxHeight: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 40px rgba(124,58,237,.12)', border: `1px solid ${P.purple200}` }} onClick={(e) => e.stopPropagation()}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${P.purple200}`, color: P.purple600 }}>
+            <Icons.MessageSquare />
+          </div>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: '-.02em' }}>Comments</h2>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: P.textSecondary }}>{ticket.title}</p>
+          </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: '#e5e7eb', marginBottom: 16 }} />
+        {ticket.description && <p style={{ margin: '0 0 16px', fontSize: 13, color: P.textMuted, lineHeight: 1.6, padding: '10px 14px', background: P.purple50, borderRadius: 10, border: `1px solid ${P.border}` }}>{ticket.description}</p>}
 
-        {/* Comments list */}
+        <div style={{ height: 1, background: P.border, marginBottom: 16 }} />
+
         <div style={{ overflowY: 'auto', flex: 1 }}>
           {!ticket.comments?.length ? (
-            <div style={{ textAlign: 'center', padding: '32px 0', color: '#9ca3af', fontSize: 14 }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>💬</div>
+            <div style={{ textAlign: 'center', padding: '32px 0', color: P.textMuted, fontSize: 13 }}>
+              <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center', color: P.purple300 }}><Icons.MessageSquare /></div>
               No comments yet
             </div>
           ) : (
             ticket.comments.map((c) => {
               const s = TYPE_STYLES[c.type] || TYPE_STYLES.comment;
               return (
-                <div
-                  key={c.id}
-                  style={{
-                    padding: '12px 14px',
-                    borderRadius: 10,
-                    background: s.bg,
-                    border: `1px solid ${s.border}`,
-                    marginBottom: 10,
-                  }}
-                >
+                <div key={c.id} style={{ padding: '12px 14px', borderRadius: 12, background: s.bg, border: `1px solid ${s.border}`, marginBottom: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                    {/* Avatar */}
-                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 11, flexShrink: 0 }}>
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: P.purple500, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 11, flexShrink: 0 }}>
                       {c.user?.name?.charAt(0).toUpperCase()}
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{c.user?.name}</span>
-                    {/* Type badge */}
-                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: s.badge, color: '#fff', fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', marginLeft: 'auto' }}>
-                      {s.label}
-                    </span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: P.textPrimary }}>{c.user?.name}</span>
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: s.badge, color: '#fff', fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', marginLeft: 'auto' }}>{s.label}</span>
                   </div>
-                  <p style={{ margin: 0, fontSize: 13, color: '#374151', lineHeight: 1.6 }}>{c.comment}</p>
+                  <p style={{ margin: 0, fontSize: 13, color: P.textSecondary, lineHeight: 1.6 }}>{c.comment}</p>
                 </div>
               );
             })
           )}
         </div>
 
-{/* Footer — reply box */}
-<div style={{ marginTop: 16, borderTop: '1px solid #e5e7eb', paddingTop: 16 }}>
-          {error && (
-            <div style={{ padding: '8px 12px', background: '#fee2e2', borderRadius: 8, color: '#991b1b', fontSize: 12, marginBottom: 10 }}>
-              ⚠️ {error}
-            </div>
-          )}
-          <textarea
-            value={reply}
-            onChange={(e) => setReply(e.target.value)}
-            placeholder="Write a reply to the owner's feedback..."
-            rows={3}
-            style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 13, fontFamily: 'inherit', boxSizing: 'border-box', resize: 'vertical', outline: 'none' }}
-          />
-          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-            <button
-              onClick={onClose}
-              style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontWeight: 500, color: '#374151', fontSize: 13 }}
-            >
+        <div style={{ marginTop: 16, borderTop: `1px solid ${P.border}`, paddingTop: 16 }}>
+          {error && <div style={{ padding: '8px 12px', background: '#fee2e2', borderRadius: 8, color: '#991b1b', fontSize: 12, marginBottom: 10 }}>⚠ {error}</div>}
+          <textarea value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Write a reply…" rows={3} style={field} />
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <button onClick={onClose}
+              style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: 'pointer', fontWeight: 600, color: P.textSecondary, fontSize: 13 }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = P.white; e.currentTarget.style.borderColor = P.border; }}>
               Close
             </button>
-            <button
-              onClick={handleReply}
-              disabled={loading || !reply.trim()}
-              style={{ flex: 2, padding: '9px 0', borderRadius: 8, border: 'none', background: reply.trim() ? '#6366f1' : '#c7d2fe', color: '#fff', cursor: reply.trim() ? 'pointer' : 'not-allowed', fontWeight: 600, fontSize: 13 }}
-            >
-              {loading ? 'Sending...' : '↩ Send Reply'}
+            <button onClick={handleReply} disabled={loading || !reply.trim()}
+              style={{ flex: 2, padding: '10px 0', borderRadius: 12, border: 'none', background: reply.trim() ? P.purple600 : P.purple300, color: '#fff', cursor: reply.trim() ? 'pointer' : 'not-allowed', fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, boxShadow: reply.trim() ? '0 4px 16px rgba(124,58,237,.3)' : 'none', transition: 'all .2s' }}
+              onMouseEnter={(e) => { if (reply.trim()) e.currentTarget.style.background = P.purple700; }}
+              onMouseLeave={(e) => { if (reply.trim()) e.currentTarget.style.background = P.purple600; }}>
+              <Icons.Reply /> {loading ? 'Sending…' : 'Send Reply'}
             </button>
           </div>
         </div>
@@ -288,11 +470,15 @@ function CommentsModal({ ticket, projectId, onClose, onReplied }) {
   );
 }
 
-// ─── Invite Modal ─────────────────────────────────────────────────────────────
+// ── Invite Modal ───────────────────────────────────────────────────────────
 function InviteModal({ projectId, onDone, onClose }) {
   const [email, setEmail]   = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState(null);
+
+  const field = { width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: P.textPrimary, background: P.purple50, transition: 'border-color .15s, box-shadow .15s' };
+  const focusIn  = (e) => { e.target.style.borderColor = P.purple500; e.target.style.boxShadow = `0 0 0 3px ${P.purple100}`; };
+  const focusOut = (e) => { e.target.style.borderColor = P.border; e.target.style.boxShadow = 'none'; };
 
   async function handleInvite() {
     if (!email.trim()) return;
@@ -313,25 +499,41 @@ function InviteModal({ projectId, onDone, onClose }) {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: 420, boxShadow: '0 20px 60px rgba(0,0,0,.2)' }} onClick={(e) => e.stopPropagation()}>
-        <h2 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: '#111827' }}>👥 Invite Member</h2>
-        <p style={{ margin: '0 0 20px', fontSize: 13, color: '#6b7280' }}>Invite a registered user to join this project</p>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(107,114,128,.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
+      <div style={{ background: P.white, borderRadius: 20, padding: 32, width: 440, maxWidth: '94vw', boxShadow: '0 8px 40px rgba(124,58,237,.12)', border: `1px solid ${P.purple200}` }} onClick={(e) => e.stopPropagation()}>
 
-        {error && <div style={{ padding: '10px 14px', background: '#fee2e2', borderRadius: 8, color: '#991b1b', fontSize: 13, marginBottom: 16 }}>⚠️ {error}</div>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${P.purple200}`, color: P.purple600 }}>
+            <Icons.UserPlus />
+          </div>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: '-.02em' }}>Invite Member</h2>
+            <p style={{ margin: 0, fontSize: 12, color: P.textMuted }}>Invite a registered user to this project</p>
+          </div>
+        </div>
 
-        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Email Address</label>
-        <input
-          type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-          placeholder="member@example.com"
-          style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
-          onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-        />
+        {error && <div style={{ padding: '10px 14px', background: '#fee2e2', borderRadius: 10, color: '#991b1b', fontSize: 13, marginBottom: 16, border: '1px solid #fecaca' }}>⚠ {error}</div>}
 
-        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontWeight: 500, color: '#374151', fontSize: 14 }}>Cancel</button>
-          <button onClick={handleInvite} disabled={loading || !email.trim()} style={{ flex: 2, padding: '10px 0', borderRadius: 8, border: 'none', background: email.trim() ? '#6366f1' : '#c7d2fe', color: '#fff', cursor: email.trim() ? 'pointer' : 'not-allowed', fontWeight: 600, fontSize: 14 }}>
-            {loading ? 'Inviting...' : 'Send Invite'}
+        <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textSecondary, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.06em' }}>Email Address</label>
+        <div style={{ position: 'relative' }}>
+          <div style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: P.textMuted, display: 'flex', alignItems: 'center' }}><Icons.Mail /></div>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="member@example.com"
+            style={{ ...field, paddingLeft: 42 }} onFocus={focusIn} onBlur={focusOut}
+            onKeyDown={(e) => e.key === 'Enter' && handleInvite()} autoFocus />
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 28 }}>
+          <button onClick={onClose}
+            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: 'pointer', fontWeight: 600, color: P.textSecondary, fontSize: 14, transition: 'all .15s' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; e.currentTarget.style.color = P.purple600; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = P.white; e.currentTarget.style.borderColor = P.border; e.currentTarget.style.color = P.textSecondary; }}>
+            Cancel
+          </button>
+          <button onClick={handleInvite} disabled={loading || !email.trim()}
+            style={{ flex: 2, padding: '11px 0', borderRadius: 12, border: 'none', background: email.trim() ? P.purple600 : P.purple300, color: '#fff', cursor: email.trim() ? 'pointer' : 'not-allowed', fontWeight: 700, fontSize: 14, boxShadow: email.trim() ? '0 4px 16px rgba(124,58,237,.3)' : 'none', transition: 'all .2s' }}
+            onMouseEnter={(e) => { if (email.trim()) e.currentTarget.style.background = P.purple700; }}
+            onMouseLeave={(e) => { if (email.trim()) e.currentTarget.style.background = P.purple600; }}>
+            {loading ? 'Inviting…' : 'Send Invite'}
           </button>
         </div>
       </div>
@@ -339,77 +541,161 @@ function InviteModal({ projectId, onDone, onClose }) {
   );
 }
 
-// ─── Ticket Card ──────────────────────────────────────────────────────────────
-function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, currentColumn }) {
-  const p = PRIORITY_COLORS[ticket.priority] || PRIORITY_COLORS.medium;
+// ── Members Dropdown ───────────────────────────────────────────────────────
+function MembersDropdown({ members, projectData }) {
+  const [open, setOpen] = useState(false);
 
-  // What moves are allowed
-  const memberMoves = { todo: 'in_progress', in_progress: 'review' };
+  useEffect(() => {
+    function handleClick() { setOpen(false); }
+    if (open) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
 
   return (
-    <div style={{ background: '#fff', borderRadius: 12, padding: '14px 16px', marginBottom: 10, boxShadow: '0 1px 4px rgba(0,0,0,.08)', border: '1px solid #e5e7eb' }}>
+    <div style={{ position: 'relative' }}>
+      <button onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+        style={{ display: 'flex', alignItems: 'center', gap: 6, background: open ? P.purple50 : 'transparent', border: `1.5px solid ${open ? P.purple300 : P.border}`, borderRadius: 10, padding: '5px 10px', cursor: 'pointer', transition: 'all .15s', color: P.textSecondary }}
+        onMouseEnter={(e) => { if (!open) { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; }}}
+        onMouseLeave={(e) => { if (!open) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = P.border; }}}>
+        <div style={{ display: 'flex' }}>
+          {members.slice(0, 4).map((m, i) => (
+            <div key={m.id} title={m.user?.name} style={{ width: 24, height: 24, borderRadius: '50%', background: P.purple500, border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 10, marginLeft: i > 0 ? -8 : 0 }}>
+              {m.user?.name?.charAt(0).toUpperCase()}
+            </div>
+          ))}
+          {members.length > 4 && (
+            <div style={{ width: 24, height: 24, borderRadius: '50%', background: P.purple200, border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.purple600, fontWeight: 700, fontSize: 9, marginLeft: -8 }}>
+              +{members.length - 4}
+            </div>
+          )}
+        </div>
+        <span style={{ fontSize: 12, fontWeight: 600 }}>{members.length} member{members.length !== 1 ? 's' : ''}</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
 
+      {open && (
+        <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setOpen(false)} />
+          <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, background: P.white, border: `1px solid ${P.purple200}`, borderRadius: 14, boxShadow: '0 8px 30px rgba(124,58,237,.12)', minWidth: 230, zIndex: 100, overflow: 'hidden' }}>
+            <div style={{ padding: '10px 16px', borderBottom: `1px solid ${P.border}`, fontSize: 11, fontWeight: 700, color: P.textMuted, letterSpacing: '.06em', textTransform: 'uppercase' }}>
+              Project Members
+            </div>
+            {members.map((m) => (
+              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: `1px solid ${P.border}` }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: m.user?.id === projectData.owner_id ? P.purple600 : P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', color: m.user?.id === projectData.owner_id ? '#fff' : P.purple600, fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                  {m.user?.name?.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: P.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user?.name}</div>
+                  <div style={{ fontSize: 11, color: P.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user?.email}</div>
+                </div>
+                {m.user?.id === projectData.owner_id && (
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: P.purple100, color: P.purple600, display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                    <Icons.Crown /> Owner
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Ticket Card ────────────────────────────────────────────────────────────
+function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, currentColumn }) {
+  const p = PRIORITY[ticket.priority] || PRIORITY.medium;
+  const [hover, setHover] = useState(false);
+
+  const memberMoves = { todo: 'in_progress', in_progress: 'review' };
+  const targetCol = memberMoves[currentColumn] ? COLUMNS.find(c => c.key === memberMoves[currentColumn]) : null;
+
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{ background: hover ? P.purple50 : P.white, borderRadius: 12, padding: '14px 16px', marginBottom: 10, boxShadow: hover ? '0 4px 16px rgba(124,58,237,.1)' : '0 1px 4px rgba(0,0,0,.06)', border: hover ? `1px solid ${P.purple200}` : `1px solid ${P.border}`, transition: 'all .15s', cursor: 'default' }}
+    >
       {/* Priority + actions */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.05em', textTransform: 'uppercase', padding: '2px 8px', borderRadius: 20, color: p.text, background: p.bg }}>
-          {ticket.priority}
-        </span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: p.dot }} />
+          <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, color: p.text, background: p.bg, letterSpacing: '.04em', textTransform: 'uppercase' }}>
+            {p.label}
+          </span>
+        </div>
         {isOwner && (
-          <div style={{ display: 'flex', gap: 4 }}>
-            <button onClick={() => onEdit(ticket)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: '2px 4px', opacity: 0.6 }}>✏️</button>
-            <button onClick={() => onDelete(ticket.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: '2px 4px', opacity: 0.6 }}>🗑</button>
+          <div style={{ display: 'flex', gap: 2, opacity: hover ? 1 : 0, transition: 'opacity .15s' }}>
+            <button onClick={() => onEdit(ticket)}
+              style={{ background: P.purple100, border: 'none', cursor: 'pointer', borderRadius: 6, padding: '4px 7px', color: P.purple600, display: 'flex', alignItems: 'center' }}>
+              <Icons.Edit />
+            </button>
+            <button onClick={() => onDelete(ticket.id)}
+              style={{ background: '#fee2e2', border: 'none', cursor: 'pointer', borderRadius: 6, padding: '4px 7px', color: '#dc2626', display: 'flex', alignItems: 'center' }}>
+              <Icons.Trash />
+            </button>
           </div>
         )}
       </div>
 
-      <p onClick={() => onViewDetail(ticket)} style={{ margin: '0 0 6px', fontWeight: 600, fontSize: 14, color: '#111827', lineHeight: 1.4, cursor: 'pointer', textDecoration: 'underline dotted' }}>{ticket.title}</p>
-      {ticket.description && <p style={{ margin: '0 0 10px', fontSize: 12, color: '#6b7280', lineHeight: 1.5 }}>{ticket.description}</p>}
+      {/* Title */}
+      <p onClick={() => onViewDetail(ticket)}
+        style={{ margin: '0 0 6px', fontWeight: 600, fontSize: 13, color: P.textPrimary, lineHeight: 1.4, cursor: 'pointer' }}
+        onMouseEnter={(e) => e.currentTarget.style.color = P.purple600}
+        onMouseLeave={(e) => e.currentTarget.style.color = P.textPrimary}>
+        {ticket.title}
+      </p>
+      {ticket.description && (
+        <p style={{ margin: '0 0 10px', fontSize: 11.5, color: P.textMuted, lineHeight: 1.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ticket.description}</p>
+      )}
 
       {/* Assignee */}
       {ticket.assignee && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-          <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 10 }}>
+          <div style={{ width: 20, height: 20, borderRadius: '50%', background: P.purple500, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 10 }}>
             {ticket.assignee.name?.charAt(0).toUpperCase()}
           </div>
-          <span style={{ fontSize: 12, color: '#6b7280' }}>{ticket.assignee.name}</span>
+          <span style={{ fontSize: 11.5, color: P.textMuted }}>{ticket.assignee.name}</span>
         </div>
       )}
 
-      {/* Comments count — clickable for everyone */}
+      {/* Comments badge */}
       {ticket.comments?.length > 0 && (
-        <button
-          onClick={() => onViewComments(ticket)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 4,
-            background: '#f0f4ff', border: '1px solid #c7d2fe',
-            borderRadius: 6, padding: '3px 10px', marginBottom: 10,
-            cursor: 'pointer', fontSize: 11, color: '#4f46e5', fontWeight: 600,
-          }}
-        >
-          💬 {ticket.comments.length} comment{ticket.comments.length !== 1 ? 's' : ''} — view
+        <button onClick={() => onViewComments(ticket)}
+          style={{ display: 'flex', alignItems: 'center', gap: 5, background: P.purple100, border: `1px solid ${P.purple200}`, borderRadius: 7, padding: '3px 10px', marginBottom: 10, cursor: 'pointer', fontSize: 11, color: P.purple600, fontWeight: 600, transition: 'all .15s' }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = P.purple200; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = P.purple100; }}>
+          <Icons.MessageSquare /> {ticket.comments.length} comment{ticket.comments.length !== 1 ? 's' : ''}
         </button>
       )}
 
       {/* Action buttons */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-        {/* Member move */}
-        {!isOwner && memberMoves[currentColumn] && (
-          <button onClick={() => onMove(ticket, memberMoves[currentColumn])} style={{ flex: 1, padding: '6px 0', borderRadius: 7, border: '1px solid #6366f1', background: '#eef2ff', color: '#6366f1', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
-            → {COLUMNS.find(c => c.key === memberMoves[currentColumn])?.label}
+        {!isOwner && targetCol && (
+          <button onClick={() => onMove(ticket, targetCol.key)}
+            style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: `1px solid ${targetCol.border}`, background: targetCol.light, color: targetCol.color, cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = targetCol.border}
+            onMouseLeave={(e) => e.currentTarget.style.background = targetCol.light}>
+            <Icons.ArrowRight /> Move to {targetCol.label}
           </button>
         )}
 
-        {/* Owner review button */}
         {isOwner && currentColumn === 'review' && (
-          <button onClick={() => onReview(ticket)} style={{ flex: 1, padding: '6px 0', borderRadius: 7, border: 'none', background: '#8b5cf6', color: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
-            📋 Review
+          <button onClick={() => onReview(ticket)}
+            style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: 'none', background: P.purple600, color: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, boxShadow: '0 2px 8px rgba(124,58,237,.3)', transition: 'all .15s' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = P.purple700}
+            onMouseLeave={(e) => e.currentTarget.style.background = P.purple600}>
+            <Icons.ClipboardCheck /> Review
           </button>
         )}
 
-        {/* Owner archive button */}
         {isOwner && currentColumn === 'done' && (
-          <button onClick={() => onMove(ticket, 'archived')} style={{ flex: 1, padding: '6px 0', borderRadius: 7, border: '1px solid #6b7280', background: '#f9fafb', color: '#6b7280', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
-            📦 Archive
+          <button onClick={() => onMove(ticket, 'archived')}
+            style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: `1px solid ${P.border}`, background: P.bg, color: P.textSecondary, cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; e.currentTarget.style.color = P.purple600; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = P.bg; e.currentTarget.style.borderColor = P.border; e.currentTarget.style.color = P.textSecondary; }}>
+            <Icons.Archive /> Archive
           </button>
         )}
       </div>
@@ -417,21 +703,84 @@ function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, on
   );
 }
 
-// ─── Main ProjectBoard ────────────────────────────────────────────────────────
+// ── Column ─────────────────────────────────────────────────────────────────
+function BoardColumn({ column, tickets, isOwner, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, onAddClick }) {
+  return (
+    <div style={{ minWidth: 290, flex: '0 0 290px', background: P.white, borderRadius: 16, border: `1px solid ${column.border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 6px rgba(124,58,237,.05)' }}>
+      {/* Header */}
+      <div style={{ padding: '13px 16px', background: column.light, borderBottom: `1px solid ${column.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: 9, height: 9, borderRadius: '50%', background: column.color, flexShrink: 0 }} />
+        <h3 style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: P.textPrimary, flex: 1, letterSpacing: '.05em', textTransform: 'uppercase' }}>{column.label}</h3>
+        <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: column.color, color: '#fff', minWidth: 20, textAlign: 'center' }}>
+          {tickets.length}
+        </span>
+        {isOwner && (
+          <button onClick={() => onAddClick(column.key)}
+            style={{ background: column.color, border: 'none', cursor: 'pointer', borderRadius: 6, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 15, lineHeight: 1 }}>
+            +
+          </button>
+        )}
+      </div>
+
+      {/* Tickets */}
+      <div style={{ padding: '12px 12px 0', overflowY: 'auto', flex: 1, minHeight: 80, maxHeight: 520 }}>
+        {tickets.length === 0 ? (
+          <div style={{ border: `2px dashed ${column.border}`, borderRadius: 10, padding: '26px 0', textAlign: 'center', color: P.textMuted, fontSize: 12.5, marginBottom: 12 }}>
+            <div style={{ marginBottom: 5, display: 'flex', justifyContent: 'center', color: P.textMuted }}><Icons.Inbox /></div>
+            No tickets
+          </div>
+        ) : (
+          tickets.map((ticket) => (
+            <TicketCard
+              key={ticket.id}
+              ticket={ticket}
+              isOwner={isOwner}
+              projectId={projectId}
+              currentColumn={column.key}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onReview={onReview}
+              onMove={onMove}
+              onViewComments={onViewComments}
+              onViewDetail={onViewDetail}
+            />
+          ))
+        )}
+      </div>
+
+      {/* Footer */}
+      {isOwner && (
+        <div style={{ borderTop: `1px solid ${P.border}`, padding: '9px 16px' }}>
+          <button onClick={() => onAddClick(column.key)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12.5, color: P.textMuted, display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', padding: 0, transition: 'color .15s' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = column.color}
+            onMouseLeave={(e) => e.currentTarget.style.color = P.textMuted}>
+            <span style={{ fontSize: 15, fontWeight: 700 }}>+</span> Add ticket
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main ProjectBoard ──────────────────────────────────────────────────────
 export default function ProjectBoard({ project, user, onBack, onLogout }) {
-  const [columns, setColumns]           = useState({ todo: [], in_progress: [], review: [], done: [], archived: [] });
-  const [members, setMembers]           = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [ticketModal, setTicketModal]   = useState(null);
-  const [reviewModal, setReviewModal]   = useState(null);
-  const [commentsModal, setCommentsModal] = useState(null); // ← NEW
-  const [detailModal, setDetailModal] = useState(null);
-  const [inviteModal, setInviteModal]   = useState(false);
-  const [error, setError]               = useState(null);
-  const [projectData, setProjectData]   = useState(project);
-  const [showMembers, setShowMembers]   = useState(false);
+  const [columns, setColumns]             = useState({ todo: [], in_progress: [], review: [], done: [], archived: [] });
+  const [members, setMembers]             = useState([]);
+  const [loading, setLoading]             = useState(true);
+  const [ticketModal, setTicketModal]     = useState(null);
+  const [reviewModal, setReviewModal]     = useState(null);
+  const [commentsModal, setCommentsModal] = useState(null);
+  const [detailModal, setDetailModal]     = useState(null);
+  const [inviteModal, setInviteModal]     = useState(false);
+  const [error, setError]                 = useState(null);
+  const [projectData, setProjectData]     = useState(project);
 
   const isOwner = project.is_owner || project.owner_id === user.id;
+
+  const totalTickets = Object.values(columns).flat().length;
+  const doneTickets  = columns.done?.length ?? 0;
+  const progress     = totalTickets ? Math.round((doneTickets / totalTickets) * 100) : 0;
 
   async function loadBoard() {
     try {
@@ -442,7 +791,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
       setColumns(ticketsData);
       setMembers(projectDetail.members || []);
       setProjectData(projectDetail);
-    } catch (e) {
+    } catch {
       setError('Could not load board.');
     } finally {
       setLoading(false);
@@ -460,7 +809,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
       }
       setTicketModal(null);
       loadBoard();
-    } catch (e) {
+    } catch {
       alert('Failed to save ticket.');
     }
   }
@@ -484,203 +833,148 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
     }
   }
 
-  const totalTickets = Object.values(columns).flat().length;
-  const doneTickets  = columns.done?.length ?? 0;
-  const progress     = totalTickets ? Math.round((doneTickets / totalTickets) * 100) : 0;
-
   if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', color: '#6b7280', fontFamily: 'system-ui' }}>
-      Loading board...
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', color: P.purple500, fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", gap: 10 }}>
+      <div style={{ width: 18, height: 18, border: `2px solid ${P.purple100}`, borderTopColor: P.purple600, borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
+      Loading board…
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 
   return (
-    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", minHeight: '100vh', background: '#f3f4f6' }}>
+    <div style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", minHeight: '100vh', background: P.bg }}>
 
-      {/* Header */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '18px 32px', display: 'flex', alignItems: 'center', gap: 16 }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#6b7280', padding: '4px 8px', borderRadius: 8 }}>←</button>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#111827' }}>🗂 {projectData.name}</h1>
-          <p style={{ margin: '3px 0 0', fontSize: 13, color: '#6b7280' }}>{doneTickets}/{totalTickets} tickets done · {progress}%</p>
+      {/* ── Navbar ──────────────────────────────────────────────────────── */}
+      <header style={{
+        background: P.white, borderBottom: `1px solid ${P.border}`,
+        padding: '0 24px', height: 56,
+        display: 'flex', alignItems: 'center', gap: 10,
+        position: 'sticky', top: 0, zIndex: 1000,
+        boxShadow: '0 1px 8px rgba(124,58,237,.06)',
+      }}>
+        {/* Logo + brand */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 4 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${P.purple200}` }}>
+            <LaravelLogo size={18} />
+          </div>
+          <span style={{ fontWeight: 800, fontSize: 16, color: P.textPrimary, letterSpacing: '-.03em' }}>DailyMe</span>
         </div>
-        <div style={{ flex: 1 }} />
+
+        <div style={{ width: 1, height: 22, background: P.border, margin: '0 2px' }} />
+
+        {/* Back button */}
+        <Tooltip label="Back to Projects">
+          <button onClick={onBack}
+            style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid transparent`, background: 'transparent', color: P.textSecondary, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s', fontSize: 18 }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple200; e.currentTarget.style.color = P.purple600; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = P.textSecondary; }}>
+            {<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} 
+          </button>
+        </Tooltip>
+
+        <div style={{ width: 1, height: 22, background: P.border, margin: '0 2px' }} />
+
+        {/* Project info */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <span style={{ fontWeight: 700, fontSize: 14, color: P.textPrimary, letterSpacing: '-.02em', lineHeight: 1 }}>{projectData.name}</span>
+          <span style={{ fontSize: 11, color: P.textMuted, lineHeight: 1 }}>{doneTickets}/{totalTickets} done · {progress}%</span>
+        </div>
 
         {/* Progress bar */}
-        <div style={{ width: 140, height: 6, background: '#e5e7eb', borderRadius: 99 }}>
-          <div style={{ height: '100%', borderRadius: 99, background: '#10b981', width: `${progress}%`, transition: 'width .4s ease' }} />
+        <div style={{ width: 80, height: 4, background: P.purple100, borderRadius: 99, marginLeft: 4 }}>
+          <div style={{ height: '100%', borderRadius: 99, background: P.purple500, width: `${progress}%`, transition: 'width .4s ease' }} />
         </div>
 
-            {/* Members avatars + dropdown */}
-            <div style={{ position: 'relative' }}>
-            <button
-                onClick={() => setShowMembers((v) => !v)}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: '1px solid #e5e7eb', borderRadius: 10, padding: '5px 10px', cursor: 'pointer' }}
-            >
-                <div style={{ display: 'flex' }}>
-                {members.slice(0, 4).map((m, i) => (
-                    <div key={m.id} title={m.user?.name} style={{ width: 26, height: 26, borderRadius: '50%', background: '#6366f1', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 11, marginLeft: i > 0 ? -8 : 0 }}>
-                    {m.user?.name?.charAt(0).toUpperCase()}
-                    </div>
-                ))}
-                {members.length > 4 && (
-                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#e5e7eb', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontWeight: 700, fontSize: 10, marginLeft: -8 }}>
-                    +{members.length - 4}
-                    </div>
-                )}
-                </div>
-                <span style={{ fontSize: 12, color: '#6b7280', fontWeight: 500 }}>
-                {members.length} member{members.length !== 1 ? 's' : ''} ▾
-                </span>
-            </button>
+        <div style={{ flex: 1 }} />
 
-            {showMembers && (
-                <>
-                {/* Backdrop to close on outside click */}
-                <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMembers(false)} />
-                <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,.1)', minWidth: 220, zIndex: 100, overflow: 'hidden' }}>
-                    <div style={{ padding: '10px 14px', borderBottom: '1px solid #f3f4f6', fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: '.06em', textTransform: 'uppercase' }}>
-                    Project Developers
-                    </div>
-                    {members.map((m) => (
-                    <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid #f9fafb' }}>
-                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: m.user?.id === projectData.owner_id ? '#6366f1' : '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: m.user?.id === projectData.owner_id ? '#fff' : '#6366f1', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
-                        {m.user?.name?.charAt(0).toUpperCase()}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user?.name}</div>
-                        <div style={{ fontSize: 11, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user?.email}</div>
-                        </div>
-                        {m.user?.id === projectData.owner_id && (
-                        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#eef2ff', color: '#6366f1', flexShrink: 0 }}>Owner</span>
-                        )}
-                    </div>
-                    ))}
-                </div>
-                </>
-            )}
-            </div>
+        {/* Notifications */}
+          <Tooltip label="Notifications">
+          <NotificationBell onOpenProject={() => onBack()} />
+        </Tooltip>
 
-          {/* Notifications */}
-        <NotificationBell onOpenProject={() => onBack()} />
+        <div style={{ width: 1, height: 22, background: P.border, margin: '0 2px' }} />
 
-        {/* Owner actions */}
+        {/* Members dropdown */}
+       <MembersDropdown members={members} projectData={projectData} />
+
         {isOwner && (
           <>
-            <button onClick={() => setInviteModal(true)} style={{ padding: '9px 16px', background: 'none', color: '#6b7280', border: '1px solid #e5e7eb', borderRadius: 10, cursor: 'pointer', fontWeight: 500, fontSize: 13 }}>
-              👥 Invite
+            <button onClick={() => setInviteModal(true)}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'transparent', color: P.textSecondary, border: `1.5px solid ${P.border}`, borderRadius: 9, cursor: 'pointer', fontWeight: 600, fontSize: 13, transition: 'all .15s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; e.currentTarget.style.color = P.purple600; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = P.border; e.currentTarget.style.color = P.textSecondary; }}>
+              <Icons.UserPlus /> Invite
             </button>
-            <button onClick={() => setTicketModal({ ticket: null })} style={{ padding: '9px 20px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-              + New Ticket
+
+            <button onClick={() => setTicketModal({ ticket: null })}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: P.purple600, color: '#fff', border: 'none', borderRadius: 9, cursor: 'pointer', fontWeight: 700, fontSize: 13, boxShadow: '0 2px 8px rgba(124,58,237,.3)', transition: 'all .2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = P.purple600; e.currentTarget.style.transform = 'translateY(0)'; }}>
+              <Icons.Plus /> New Ticket
             </button>
           </>
         )}
 
-        {/* User avatar */}
-        {user && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13 }}>
-              {user.name?.charAt(0).toUpperCase()}
-            </div>
+        <div style={{ width: 1, height: 22, background: P.border, margin: '0 2px' }} />
+
+        {/* User avatar + signout */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 34, height: 34, borderRadius: '50%', background: P.purple500, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, border: `2px solid ${P.purple300}` }}>
+            {user?.name?.charAt(0).toUpperCase()}
           </div>
-        )}
+        </div>
 
-        <button onClick={onLogout}
-          style={{ padding: '9px 16px', background: 'none', color: '#6b7280', border: '1px solid #e5e7eb', borderRadius: 10, cursor: 'pointer', fontWeight: 500, fontSize: 13 }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.color = '#dc2626'; e.currentTarget.style.borderColor = '#fca5a5'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
-        >
-          Signout
-        </button>
-      </div>
+        <Tooltip label="Sign out">
+          <button onClick={onLogout}
+            style={{ width: 36, height: 36, borderRadius: 10, border: '1.5px solid transparent', background: 'transparent', color: P.textSecondary, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.borderColor = '#fecaca'; e.currentTarget.style.color = '#dc2626'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = P.textSecondary; }}>
+            <Icons.LogOut />
+          </button>
+        </Tooltip>
+      </header>
 
-      {error && <div style={{ margin: 24, padding: 16, background: '#fee2e2', borderRadius: 10, color: '#991b1b', fontSize: 14 }}>⚠️ {error}</div>}
+      {error && (
+        <div style={{ margin: '16px 28px 0', padding: '11px 16px', background: '#fef3c7', borderRadius: 10, color: '#92400e', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, border: '1px solid #fde68a' }}>
+          ⚠ {error}
+        </div>
+      )}
 
-      {/* Board columns */}
-      <div style={{ display: 'flex', gap: 16, padding: '24px 32px', alignItems: 'flex-start', overflowX: 'auto' }}>
+      {/* ── Board ───────────────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: 16, padding: '24px 28px 60px', alignItems: 'flex-start', overflowX: 'auto' }}>
         {COLUMNS.map((col) => (
-          <div key={col.key} style={{ minWidth: 280, flex: '0 0 280px', background: '#f9fafb', borderRadius: 16, padding: 16, border: '1px solid #e5e7eb' }}>
-
-            {/* Column header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: col.color }} />
-              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#111827', flex: 1 }}>{col.label}</h3>
-              <span style={{ fontSize: 12, fontWeight: 600, padding: '2px 8px', borderRadius: 12, background: col.bg, color: col.color }}>
-                {columns[col.key]?.length || 0}
-              </span>
-            </div>
-
-            {/* Tickets */}
-            <div style={{ minHeight: 80 }}>
-              {(columns[col.key] || []).length === 0 && (
-                <div style={{ border: '2px dashed #e5e7eb', borderRadius: 10, padding: '24px 0', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
-                  No tickets
-                </div>
-              )}
-              {(columns[col.key] || []).map((ticket) => (
-                <TicketCard
-                  key={ticket.id}
-                  ticket={ticket}
-                  isOwner={isOwner}
-                  projectId={project.id}
-                  currentColumn={col.key}
-                  onEdit={(t) => setTicketModal({ ticket: t })}
-                  onDelete={handleDelete}
-                  onReview={(t) => setReviewModal(t)}
-                  onMove={handleMove}
-                  onViewComments={(t) => setCommentsModal(t)}  // ← NEW
-                  onViewDetail={(t) => setDetailModal(t)}
-                />
-              ))}
-            </div>
-          </div>
+          <BoardColumn
+            key={col.key}
+            column={col}
+            tickets={columns[col.key] || []}
+            isOwner={isOwner}
+            projectId={project.id}
+            onEdit={(t) => setTicketModal({ ticket: t })}
+            onDelete={handleDelete}
+            onReview={(t) => setReviewModal(t)}
+            onMove={handleMove}
+            onViewComments={(t) => setCommentsModal(t)}
+            onViewDetail={(t) => setDetailModal(t)}
+            onAddClick={(status) => setTicketModal({ ticket: null, defaultStatus: status })}
+          />
         ))}
       </div>
 
-      {/* Modals */}
+      {/* ── Modals ──────────────────────────────────────────────────────── */}
       {ticketModal && (
-        <TicketModal
-          ticket={ticketModal.ticket}
-          members={members}
-          onSave={handleSaveTicket}
-          onClose={() => setTicketModal(null)}
-        />
+        <TicketModal ticket={ticketModal.ticket} members={members} onSave={handleSaveTicket} onClose={() => setTicketModal(null)} />
       )}
-
       {reviewModal && (
-        <ReviewModal
-          ticket={reviewModal}
-          projectId={project.id}
-          onDone={() => { setReviewModal(null); loadBoard(); }}
-          onClose={() => setReviewModal(null)}
-        />
+        <ReviewModal ticket={reviewModal} projectId={project.id} onDone={() => { setReviewModal(null); loadBoard(); }} onClose={() => setReviewModal(null)} />
       )}
-
-        {commentsModal && (
-        <CommentsModal
-          ticket={commentsModal}
-          projectId={project.id}
-          onClose={() => setCommentsModal(null)}
-          onReplied={() => { setCommentsModal(null); loadBoard(); }}    
-        />
+      {commentsModal && (
+        <CommentsModal ticket={commentsModal} projectId={project.id} onClose={() => setCommentsModal(null)} onReplied={() => { setCommentsModal(null); loadBoard(); }} />
       )}
-
-    {detailModal && (
-            <TicketDetail
-              ticket={detailModal}
-              projectId={project.id}
-              isOwner={isOwner}
-              onClose={() => setDetailModal(null)}
-              onRefresh={() => { loadBoard().then(() => setDetailModal(null)); }}
-            />
-          )}
-
+      {detailModal && (
+        <TicketDetail ticket={detailModal} projectId={project.id} isOwner={isOwner} onClose={() => setDetailModal(null)} onRefresh={() => { loadBoard().then(() => setDetailModal(null)); }} />
+      )}
       {inviteModal && (
-        <InviteModal
-          projectId={project.id}
-          onDone={() => { setInviteModal(false); loadBoard(); }}
-          onClose={() => setInviteModal(false)}
-        />
+        <InviteModal projectId={project.id} onDone={() => { setInviteModal(false); loadBoard(); }} onClose={() => setInviteModal(false)} />
       )}
     </div>
   );
