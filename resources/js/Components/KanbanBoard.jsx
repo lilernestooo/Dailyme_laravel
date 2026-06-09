@@ -4,26 +4,45 @@ import TaskHistory from './TaskHistory';
 
 const API = "/api/tasks";
 
-// ── Laravel Flame Logo (same as Register.jsx) ─────────────────────────────
+// ── Laravel Flame Logo ─────────────────────────────────────────────────────
 function LaravelLogo({ size = 28 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 50 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M49.626 11.564a.809.809 0 0 1 .028.209v10.250c0 .348-.188.670-.491.844l-8.610 4.968v9.836c0 .348-.188.670-.491.844l-17.953 10.356a.817.817 0 0 1-.114.050c-.013.005-.028.009-.042.012a.786.786 0 0 1-.213.028.786.786 0 0 1-.213-.028c-.016-.003-.030-.007-.045-.013a.818.818 0 0 1-.114-.049L.491 38.515A.981.981 0 0 1 0 37.671V6.885c0-.070.008-.140.028-.208.006-.020.015-.039.024-.059a.807.807 0 0 1 .068-.124c.012-.018.026-.035.040-.051a.809.809 0 0 1 .098-.091c.016-.013.031-.025.048-.035L9.310.192a.981.981 0 0 1 .981 0l9.025 5.208a.817.817 0 0 1 .049.031.808.808 0 0 1 .098.091.748.748 0 0 1 .040.051.826.826 0 0 1 .067.124c.010.020.018.039.025.059.019.068.028.138.028.208v19.420l7.491-4.324V11.773c0-.070.009-.140.028-.208.006-.020.015-.039.025-.059a.826.826 0 0 1 .067-.124.748.748 0 0 1 .040-.051.808.808 0 0 1 .098-.091.817.817 0 0 1 .049-.031l9.025-5.208a.981.981 0 0 1 .981 0l9.025 5.208c.017.010.033.022.049.035a.809.809 0 0 1 .098.091c.014.016.028.033.040.051a.826.826 0 0 1 .068.124c.009.020.018.039.023.059z" fill="#b94040"/>
-      <path d="M48.062 21.816l-7.491 4.324V16.308l7.491-4.324v9.832zM39.589 37.093L22.618 26.947v-9.836l16.971 9.836v10.146zM9.800 1.554L1.327 6.470 9.800 11.386l8.473-4.916L9.800 1.554zM1.327 7.832v29.430l16.971 9.800V17.230L1.327 7.832zM9.800 12.748v19.420l7.491-4.324V8.424L9.800 12.748z" fill="#b94040" opacity=".4"/>
+      <path d="M49.626 11.564a.809.809 0 0 1 .028.209v10.250c0 .348-.188.670-.491.844l-8.610 4.968v9.836c0 .348-.188.670-.491.844l-17.953 10.356a.817.817 0 0 1-.114.050c-.013.005-.028.009-.042.012a.786.786 0 0 1-.213.028.786.786 0 0 1-.213-.028c-.016-.003-.030-.007-.045-.013a.818.818 0 0 1-.114-.049L.491 38.515A.981.981 0 0 1 0 37.671V6.885c0-.070.008-.140.028-.208.006-.020.015-.039.024-.059a.807.807 0 0 1 .068-.124c.012-.018.026-.035.040-.051a.809.809 0 0 1 .098-.091c.016-.013.031-.025.048-.035L9.310.192a.981.981 0 0 1 .981 0l9.025 5.208a.817.817 0 0 1 .049.031.808.808 0 0 1 .098.091.748.748 0 0 1 .040.051.826.826 0 0 1 .067.124c.010.020.018.039.025.059.019.068.028.138.028.208v19.420l7.491-4.324V11.773c0-.070.009-.140.028-.208.006-.020.015-.039.025-.059a.826.826 0 0 1 .067-.124.748.748 0 0 1 .040-.051.808.808 0 0 1 .098-.091.817.817 0 0 1 .049-.031l9.025-5.208a.981.981 0 0 1 .981 0l9.025 5.208c.017.010.033.022.049.035a.809.809 0 0 1 .098.091c.014.016.028.033.040.051a.826.826 0 0 1 .068.124c.009.020.018.039.023.059z" fill="#7c3aed"/>
+      <path d="M48.062 21.816l-7.491 4.324V16.308l7.491-4.324v9.832zM39.589 37.093L22.618 26.947v-9.836l16.971 9.836v10.146zM9.800 1.554L1.327 6.470 9.800 11.386l8.473-4.916L9.800 1.554zM1.327 7.832v29.430l16.971 9.800V17.230L1.327 7.832zM9.800 12.748v19.420l7.491-4.324V8.424L9.800 12.748z" fill="#7c3aed" opacity=".35"/>
     </svg>
   );
 }
 
+// ── Palette ────────────────────────────────────────────────────────────────
+const P = {
+  purple50:  '#f5f3ff',
+  purple100: '#ede9fe',
+  purple200: '#ddd6fe',
+  purple300: '#c4b5fd',
+  purple400: '#a78bfa',
+  purple500: '#8b5cf6',
+  purple600: '#7c3aed',
+  purple700: '#6d28d9',
+  textPrimary:   '#1e1b4b',
+  textSecondary: '#6b7280',
+  textMuted:     '#9ca3af',
+  border:        '#ede9fe',
+  borderMid:     '#c4b5fd',
+  white:         '#ffffff',
+  bg:            '#faf9ff',
+};
+
 const COLUMNS = [
-  { key: "todo",        label: "To Do",       color: "#FF2D20", light: "#fff5f5", dot: "#f87171", border: "#fde8e8" },
-  { key: "in_progress", label: "In Progress",  color: "#f59e0b", light: "#fffbeb", dot: "#fbbf24", border: "#fde68a" },
-  { key: "done",        label: "Done",         color: "#10b981", light: "#ecfdf5", dot: "#34d399", border: "#a7f3d0" },
+  { key: "todo",        label: "To Do",       color: P.purple600, light: P.purple50,  dot: P.purple400, border: P.purple200 },
+  { key: "in_progress", label: "In Progress",  color: "#0ea5e9",   light: "#f0f9ff",   dot: "#38bdf8",   border: "#bae6fd" },
+  { key: "done",        label: "Done",         color: "#10b981",   light: "#ecfdf5",   dot: "#34d399",   border: "#a7f3d0" },
 ];
 
 const PRIORITY = {
-  low:    { label: "Low",    text: "#059669", bg: "#d1fae5", dot: "#34d399" },
-  medium: { label: "Medium", text: "#b45309", bg: "#fef3c7", dot: "#fbbf24" },
-  high:   { label: "High",   text: "#dc2626", bg: "#fee2e2", dot: "#f87171" },
+  low:    { label: "Low",    text: "#065f46", bg: "#d1fae5", dot: "#34d399" },
+  medium: { label: "Medium", text: "#92400e", bg: "#fef3c7", dot: "#fbbf24" },
+  high:   { label: "High",   text: "#991b1b", bg: "#fee2e2", dot: "#f87171" },
 };
 
 async function apiFetch(url, options = {}) {
@@ -40,7 +59,62 @@ async function apiFetch(url, options = {}) {
   return res.json();
 }
 
-/* ─── Task Modal ─────────────────────────────────────────────────────────── */
+// ── Tooltip wrapper ────────────────────────────────────────────────────────
+function Tooltip({ label, children }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div
+      style={{ position: "relative", display: "inline-flex" }}
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {show && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)",
+          background: P.textPrimary, color: "#fff", fontSize: 11, fontWeight: 600,
+          padding: "4px 10px", borderRadius: 6, whiteSpace: "nowrap", pointerEvents: "none",
+          letterSpacing: ".03em", zIndex: 9999,
+        }}>
+          {label}
+          <div style={{ position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)", borderWidth: 4, borderStyle: "solid", borderColor: `transparent transparent ${P.textPrimary} transparent` }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Icon button ─────────────────────────────────────────────────────────────
+function NavIcon({ icon, label, onClick, active, badge }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <Tooltip label={label}>
+      <button
+        onClick={onClick}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        style={{
+          position: "relative", width: 36, height: 36, borderRadius: 10,
+          border: active ? `1.5px solid ${P.purple300}` : "1.5px solid transparent",
+          background: active ? P.purple100 : hover ? P.purple50 : "transparent",
+          color: active ? P.purple600 : hover ? P.purple500 : P.textSecondary,
+          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+          transition: "all .15s", fontSize: 18,
+        }}
+      >
+        <span style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>{icon}</span>
+        {badge > 0 && (
+          <span style={{
+            position: "absolute", top: 4, right: 4, width: 8, height: 8,
+            borderRadius: "50%", background: P.purple600, border: "2px solid #fff",
+          }} />
+        )}
+      </button>
+    </Tooltip>
+  );
+}
+
+// ── Task Modal ─────────────────────────────────────────────────────────────
 function TaskModal({ task, defaultStatus, onSave, onClose }) {
   const [form, setForm] = useState({
     title:       task?.title       || "",
@@ -53,37 +127,35 @@ function TaskModal({ task, defaultStatus, onSave, onClose }) {
 
   const field = {
     width: "100%", padding: "10px 14px", borderRadius: 10,
-    border: "1.5px solid #e5e7eb", fontSize: 14, outline: "none",
-    fontFamily: "inherit", boxSizing: "border-box", color: "#111827",
-    background: "#fafafa", transition: "border-color .15s, box-shadow .15s",
+    border: `1.5px solid ${P.border}`, fontSize: 14, outline: "none",
+    fontFamily: "inherit", boxSizing: "border-box", color: P.textPrimary,
+    background: P.purple50, transition: "border-color .15s, box-shadow .15s",
   };
-
-  const focusIn  = (e) => { e.target.style.borderColor = "#FF2D20"; e.target.style.boxShadow = "0 0 0 3px rgba(255,45,32,.1)"; };
-  const focusOut = (e) => { e.target.style.borderColor = "#e5e7eb"; e.target.style.boxShadow = "none"; };
+  const focusIn  = (e) => { e.target.style.borderColor = P.purple500; e.target.style.boxShadow = `0 0 0 3px ${P.purple100}`; };
+  const focusOut = (e) => { e.target.style.borderColor = P.border; e.target.style.boxShadow = "none"; };
 
   const lbl = {
-    display: "block", fontSize: 12, fontWeight: 600,
-    color: "#374151", marginBottom: 6, marginTop: 16,
-    textTransform: "uppercase", letterSpacing: ".05em",
+    display: "block", fontSize: 11, fontWeight: 700,
+    color: P.textSecondary, marginBottom: 6, marginTop: 16,
+    textTransform: "uppercase", letterSpacing: ".06em",
   };
 
   return (
     <div
-      style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(3px)" }}
+      style={{ position: "fixed", inset: 0, background: "rgba(30,27,75,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}
       onClick={onClose}
     >
       <div
-        style={{ background: "#fff", borderRadius: 24, padding: 36, width: 460, maxWidth: "94vw", boxShadow: "0 8px 40px rgba(0,0,0,.12)", border: "1px solid rgba(255,45,32,.1)" }}
+        style={{ background: P.white, borderRadius: 20, padding: 32, width: 460, maxWidth: "94vw", boxShadow: "0 8px 40px rgba(124,58,237,.12)", border: `1px solid ${P.purple200}` }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#fff5f5,#ffe4e4)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,45,32,.15)" }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: P.purple100, display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${P.purple200}` }}>
             <LaravelLogo size={22} />
           </div>
           <div>
-            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "#111827", letterSpacing: "-.02em" }}>{task ? "Edit Task" : "New Task"}</h2>
-            <p style={{ margin: 0, fontSize: 12, color: "#9ca3af" }}>{task ? "Update task details" : "Add a task to your board"}</p>
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: "-.02em" }}>{task ? "Edit Task" : "New Task"}</h2>
+            <p style={{ margin: 0, fontSize: 12, color: P.textMuted }}>{task ? "Update task details" : "Add a task to your board"}</p>
           </div>
         </div>
 
@@ -91,7 +163,7 @@ function TaskModal({ task, defaultStatus, onSave, onClose }) {
         <input value={form.title} onChange={set("title")} placeholder="What needs to be done?" style={field} onFocus={focusIn} onBlur={focusOut} autoFocus />
 
         <label style={lbl}>Description</label>
-        <textarea value={form.description} onChange={set("description")} placeholder="Add details..." rows={3}
+        <textarea value={form.description} onChange={set("description")} placeholder="Add details…" rows={3}
           style={{ ...field, resize: "vertical" }} onFocus={focusIn} onBlur={focusOut} />
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -115,12 +187,12 @@ function TaskModal({ task, defaultStatus, onSave, onClose }) {
 
         <div style={{ display: "flex", gap: 10, marginTop: 28 }}>
           <button onClick={onClose}
-            style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: "1px solid #e5e7eb", background: "#fff", cursor: "pointer", fontWeight: 600, color: "#374151", fontSize: 14 }}>
+            style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: "pointer", fontWeight: 600, color: P.textSecondary, fontSize: 14 }}>
             Cancel
           </button>
           <button
             onClick={() => valid && onSave(form)}
-            style={{ flex: 2, padding: "11px 0", borderRadius: 12, border: "none", background: valid ? "linear-gradient(135deg,#FF2D20,#ff5c52)" : "#fca5a5", color: "#fff", cursor: valid ? "pointer" : "not-allowed", fontWeight: 700, fontSize: 14, boxShadow: valid ? "0 4px 16px rgba(255,45,32,.3)" : "none", transition: "all .2s" }}>
+            style={{ flex: 2, padding: "11px 0", borderRadius: 12, border: "none", background: valid ? P.purple600 : P.purple300, color: "#fff", cursor: valid ? "pointer" : "not-allowed", fontWeight: 700, fontSize: 14, boxShadow: valid ? `0 4px 16px rgba(124,58,237,.3)` : "none", transition: "all .2s" }}>
             {task ? "Save Changes" : "Create Task"}
           </button>
         </div>
@@ -129,7 +201,7 @@ function TaskModal({ task, defaultStatus, onSave, onClose }) {
   );
 }
 
-/* ─── Task Row ───────────────────────────────────────────────────────────── */
+// ── Task Row ────────────────────────────────────────────────────────────────
 function TaskRow({ task, onEdit, onDelete, onDragStart }) {
   const p = PRIORITY[task.priority] || PRIORITY.medium;
   const [hover, setHover] = useState(false);
@@ -141,30 +213,30 @@ function TaskRow({ task, onEdit, onDelete, onDragStart }) {
       onDragStart={(e) => onDragStart(e, task)}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ background: hover ? "#fff8f8" : "#fff", cursor: "grab", transition: "background .12s", borderBottom: "1px solid #fdf2f2" }}
+      style={{ background: hover ? P.purple50 : P.white, cursor: "grab", transition: "background .12s", borderBottom: `1px solid ${P.border}` }}
     >
-      <td style={{ paddingLeft: 16, paddingTop: 12, paddingBottom: 12, width: 8 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: p.dot }} />
+      <td style={{ paddingLeft: 14, paddingTop: 11, paddingBottom: 11, width: 8 }}>
+        <div style={{ width: 7, height: 7, borderRadius: "50%", background: p.dot }} />
       </td>
-      <td style={{ padding: "12px 12px 12px 10px", minWidth: 0 }}>
-        <div style={{ fontWeight: 600, fontSize: 13.5, color: isDone ? "#9ca3af" : "#111827", textDecoration: isDone ? "line-through" : "none", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 220 }}>
+      <td style={{ padding: "11px 10px 11px 10px", minWidth: 0 }}>
+        <div style={{ fontWeight: 600, fontSize: 13, color: isDone ? P.textMuted : P.textPrimary, textDecoration: isDone ? "line-through" : "none", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 220 }}>
           {task.title}
         </div>
         {task.description && (
-          <div style={{ fontSize: 12, color: "#d1b0b0", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 220 }}>
+          <div style={{ fontSize: 11.5, color: P.textMuted, marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 220 }}>
             {task.description}
           </div>
         )}
       </td>
-      <td style={{ padding: "12px 8px", whiteSpace: "nowrap" }}>
-        <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 8px", borderRadius: 20, color: p.text, background: p.bg }}>
+      <td style={{ padding: "11px 8px", whiteSpace: "nowrap" }}>
+        <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 7px", borderRadius: 20, color: p.text, background: p.bg }}>
           {p.label}
         </span>
       </td>
-      <td style={{ padding: "12px 16px 12px 8px", whiteSpace: "nowrap" }}>
+      <td style={{ padding: "11px 14px 11px 8px", whiteSpace: "nowrap" }}>
         <div style={{ display: "flex", gap: 2, opacity: hover ? 1 : 0, transition: "opacity .15s" }}>
           <button onClick={() => onEdit(task)} title="Edit"
-            style={{ background: "#fff5f5", border: "none", cursor: "pointer", borderRadius: 6, padding: "4px 7px", fontSize: 12, color: "#FF2D20" }}>✏️</button>
+            style={{ background: P.purple100, border: "none", cursor: "pointer", borderRadius: 6, padding: "4px 7px", fontSize: 12, color: P.purple600 }}>✏️</button>
           <button onClick={() => onDelete(task.id)} title="Delete"
             style={{ background: "#fee2e2", border: "none", cursor: "pointer", borderRadius: 6, padding: "4px 7px", fontSize: 12, color: "#dc2626" }}>🗑</button>
         </div>
@@ -173,7 +245,7 @@ function TaskRow({ task, onEdit, onDelete, onDragStart }) {
   );
 }
 
-/* ─── Kanban Column ──────────────────────────────────────────────────────── */
+// ── Kanban Column ───────────────────────────────────────────────────────────
 function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete, onEdit, onAddClick }) {
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -183,17 +255,17 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
       onDragOver={(e) => { onDragOver(e); setIsDragOver(true); }}
       onDragLeave={() => setIsDragOver(false)}
       style={{
-        flex: 1, minWidth: 300, background: "#fff", borderRadius: 16,
+        flex: 1, minWidth: 300, background: P.white, borderRadius: 16,
         border: isDragOver ? `2px solid ${column.color}` : `1px solid ${column.border}`,
-        boxShadow: isDragOver ? `0 0 0 4px ${column.light}` : "0 1px 4px rgba(255,45,32,.04)",
+        boxShadow: isDragOver ? `0 0 0 4px ${column.light}` : "0 1px 6px rgba(124,58,237,.05)",
         overflow: "hidden", transition: "border .15s, box-shadow .15s",
         display: "flex", flexDirection: "column",
       }}
     >
       {/* Header */}
-      <div style={{ padding: "14px 16px", background: column.light, borderBottom: `2px solid ${column.color}22`, display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: column.color, flexShrink: 0 }} />
-        <h3 style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "#111827", flex: 1, letterSpacing: ".04em", textTransform: "uppercase" }}>
+      <div style={{ padding: "13px 16px", background: column.light, borderBottom: `1px solid ${column.border}`, display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 9, height: 9, borderRadius: "50%", background: column.color, flexShrink: 0 }} />
+        <h3 style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: P.textPrimary, flex: 1, letterSpacing: ".05em", textTransform: "uppercase" }}>
           {column.label}
         </h3>
         <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: column.color, color: "#fff", minWidth: 20, textAlign: "center" }}>
@@ -201,15 +273,15 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
         </span>
         <button
           onClick={() => onAddClick(column.key)}
-          style={{ background: column.color, border: "none", cursor: "pointer", borderRadius: 6, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 16, lineHeight: 1 }}
+          style={{ background: column.color, border: "none", cursor: "pointer", borderRadius: 6, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 15, lineHeight: 1 }}
         >+</button>
       </div>
 
       {/* Tasks */}
       <div style={{ overflowY: "auto", flex: 1, minHeight: 120, maxHeight: 480 }}>
         {tasks.length === 0 ? (
-          <div style={{ margin: 16, border: "2px dashed #fde8e8", borderRadius: 10, padding: "28px 0", textAlign: "center", color: "#fca5a5", fontSize: 13 }}>
-            <div style={{ fontSize: 24, marginBottom: 6 }}>📭</div>
+          <div style={{ margin: 14, border: `2px dashed ${column.border}`, borderRadius: 10, padding: "26px 0", textAlign: "center", color: P.textMuted, fontSize: 12.5 }}>
+            <div style={{ fontSize: 22, marginBottom: 5 }}>📭</div>
             Drop tasks here
           </div>
         ) : (
@@ -224,21 +296,143 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
       </div>
 
       {/* Footer */}
-      <div style={{ borderTop: "1px solid #fdf2f2", padding: "10px 16px" }}>
+      <div style={{ borderTop: `1px solid ${P.border}`, padding: "9px 16px" }}>
         <button
           onClick={() => onAddClick(column.key)}
-          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#fca5a5", display: "flex", alignItems: "center", gap: 6, fontFamily: "inherit", padding: 0, transition: "color .15s" }}
+          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12.5, color: P.textMuted, display: "flex", alignItems: "center", gap: 5, fontFamily: "inherit", padding: 0, transition: "color .15s" }}
           onMouseEnter={(e) => e.currentTarget.style.color = column.color}
-          onMouseLeave={(e) => e.currentTarget.style.color = "#fca5a5"}
+          onMouseLeave={(e) => e.currentTarget.style.color = P.textMuted}
         >
-          <span style={{ fontSize: 16, fontWeight: 700 }}>+</span> Add task
+          <span style={{ fontSize: 15, fontWeight: 700 }}>+</span> Add task
         </button>
       </div>
     </div>
   );
 }
 
-/* ─── Main Board ─────────────────────────────────────────────────────────── */
+// ── Floating Status Anchors ────────────────────────────────────────────────
+function FloatingAnchors({ counts, total, onColumnClick }) {
+  const anchors = [
+    { key: "todo",        label: "To Do",      color: P.purple600, bg: P.purple100 },
+    { key: "in_progress", label: "In Progress", color: "#0ea5e9",   bg: "#e0f2fe"   },
+    { key: "done",        label: "Done",        color: "#10b981",   bg: "#d1fae5"   },
+  ];
+  const progress = total ? Math.round(((counts.done || 0) / total) * 100) : 0;
+
+  return (
+    <div style={{
+      position: "fixed", left: "50%", bottom: 28, transform: "translateX(-50%)",
+      background: P.white, borderRadius: 50, border: `1px solid ${P.purple200}`,
+      boxShadow: "0 4px 24px rgba(124,58,237,.14)", padding: "8px 18px",
+      display: "flex", alignItems: "center", gap: 4, zIndex: 200,
+    }}>
+      {anchors.map((a, i) => (
+        <React.Fragment key={a.key}>
+          <button
+            onClick={() => onColumnClick(a.key)}
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 6,
+              padding: "5px 10px", borderRadius: 30,
+              transition: "background .15s",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = a.bg}
+            onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+          >
+            <div style={{ width: 7, height: 7, borderRadius: "50%", background: a.color }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: a.color }}>{a.label}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, background: a.bg, color: a.color, borderRadius: 20, padding: "1px 7px" }}>
+              {counts[a.key] || 0}
+            </span>
+          </button>
+          {i < anchors.length - 1 && (
+            <div style={{ width: 1, height: 18, background: P.border }} />
+          )}
+        </React.Fragment>
+      ))}
+
+      <div style={{ width: 1, height: 18, background: P.border, margin: "0 4px" }} />
+
+      {/* Mini progress bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+        <div style={{ width: 60, height: 4, background: P.purple100, borderRadius: 99 }}>
+          <div style={{ height: "100%", borderRadius: 99, background: P.purple500, width: `${progress}%`, transition: "width .4s ease" }} />
+        </div>
+        <span style={{ fontSize: 11, fontWeight: 700, color: P.purple600 }}>{progress}%</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Profile Dropdown ────────────────────────────────────────────────────────
+function ProfileDropdown({ user, onLogout }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const initial = user?.name?.charAt(0).toUpperCase() || "U";
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          width: 34, height: 34, borderRadius: "50%",
+          background: open ? P.purple600 : P.purple500,
+          border: open ? `2px solid ${P.purple300}` : "2px solid transparent",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "#fff", fontWeight: 700, fontSize: 13,
+          cursor: "pointer", transition: "all .15s",
+          boxShadow: open ? `0 0 0 3px ${P.purple100}` : "none",
+        }}
+      >
+        {initial}
+      </button>
+
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 10px)", right: 0,
+          background: P.white, border: `1px solid ${P.purple200}`,
+          borderRadius: 14, boxShadow: "0 8px 30px rgba(124,58,237,.12)",
+          minWidth: 200, overflow: "hidden", zIndex: 500,
+        }}>
+          {/* Profile header */}
+          <div style={{ padding: "16px 16px 12px", borderBottom: `1px solid ${P.border}`, display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 38, height: 38, borderRadius: "50%", background: P.purple500, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
+              {initial}
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 13.5, color: P.textPrimary }}>{user?.name || "User"}</div>
+              <div style={{ fontSize: 11.5, color: P.textMuted }}>{user?.email || ""}</div>
+            </div>
+          </div>
+
+          {/* Sign out */}
+          <div style={{ padding: "6px 0" }}>
+            <button
+              onClick={onLogout}
+              style={{ width: "100%", padding: "9px 16px", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "#dc2626", textAlign: "left", transition: "background .12s" }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "#fff5f5"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main Board ─────────────────────────────────────────────────────────────
 export default function KanbanBoard({ user, onLogout, onGoToProjects }) {
   const [columns, setColumns]         = useState({ todo: [], in_progress: [], done: [] });
   const [modal, setModal]             = useState(null);
@@ -247,6 +441,7 @@ export default function KanbanBoard({ user, onLogout, onGoToProjects }) {
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory]         = useState([]);
   const dragTask = useRef(null);
+  const columnRefs = useRef({});
 
   function addHistory(task) {
     setHistory((prev) => [
@@ -255,51 +450,41 @@ export default function KanbanBoard({ user, onLogout, onGoToProjects }) {
     ]);
   }
 
-// AFTER
-async function loadTasks() {
-  try {
-    const data = await apiFetch(API);
-    setColumns({ todo: data.todo || [], in_progress: data.in_progress || [], done: data.done || [] });
-
-    setHistory((data.done || []).map((t) => ({
-      id:        t.id,
-      taskTitle: t.title,
-      priority:  t.priority,
-      from:      null,
-      at:        t.completed_at,
-    })));
-  } catch {
-    setError("Could not load tasks. Is the Laravel server running?");
-  } finally {
-    setLoading(false);
+  async function loadTasks() {
+    try {
+      const data = await apiFetch(API);
+      setColumns({ todo: data.todo || [], in_progress: data.in_progress || [], done: data.done || [] });
+      setHistory((data.done || []).map((t) => ({
+        id: t.id, taskTitle: t.title, priority: t.priority, from: null, at: t.completed_at,
+      })));
+    } catch {
+      setError("Could not load tasks. Is the Laravel server running?");
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   useEffect(() => { loadTasks(); }, []);
 
-// AFTER
-async function handleSave(form) {
-  try {
-    if (modal.task) {
-      await apiFetch(`${API}/${modal.task.id}`, { method: "PUT", body: JSON.stringify(form) });
-      if (form.status === "done" && modal.task.status !== "done") {
-        // Task just became done via modal — add to history
-        addHistory({ title: form.title, priority: form.priority, from: modal.task.status });
-      } else if (form.status !== "done" && modal.task.status === "done") {
-        // Task moved away from done — remove from history
-        setHistory((prev) => prev.filter((h) => h.taskTitle !== modal.task.title));
+  async function handleSave(form) {
+    try {
+      if (modal.task) {
+        await apiFetch(`${API}/${modal.task.id}`, { method: "PUT", body: JSON.stringify(form) });
+        if (form.status === "done" && modal.task.status !== "done") {
+          addHistory({ title: form.title, priority: form.priority, from: modal.task.status });
+        } else if (form.status !== "done" && modal.task.status === "done") {
+          setHistory((prev) => prev.filter((h) => h.taskTitle !== modal.task.title));
+        }
+      } else {
+        await apiFetch(API, { method: "POST", body: JSON.stringify(form) });
+        if (form.status === "done") addHistory({ title: form.title, priority: form.priority, from: null });
       }
-    } else {
-      await apiFetch(API, { method: "POST", body: JSON.stringify(form) });
-      if (form.status === "done")
-        addHistory({ title: form.title, priority: form.priority, from: null });
+      setModal(null);
+      loadTasks();
+    } catch {
+      alert("Failed to save task.");
     }
-    setModal(null);
-    loadTasks();
-  } catch {
-    alert("Failed to save task.");
   }
-}
 
   async function handleDelete(id) {
     if (!confirm("Delete this task?")) return;
@@ -315,156 +500,121 @@ async function handleSave(form) {
   function handleDragStart(e, task) { dragTask.current = task; e.dataTransfer.effectAllowed = "move"; }
   function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }
 
-// AFTER
-async function handleDrop(e, newStatus) {
-  e.preventDefault();
-  const task = dragTask.current;
-  if (!task || task.status === newStatus) return;
-  const targetLength = columns[newStatus]?.length ?? 0;
-  await apiFetch(`${API}/${task.id}/move`, { method: "PATCH", body: JSON.stringify({ status: newStatus, order: targetLength }) });
-
-  if (newStatus === "done") {
-    // Dragged into Done — add to history
-    addHistory({ title: task.title, priority: task.priority, from: task.status });
-  } else if (task.status === "done") {
-    // Dragged out of Done — remove from history
-    setHistory((prev) => prev.filter((h) => h.taskTitle !== task.title));
+  async function handleDrop(e, newStatus) {
+    e.preventDefault();
+    const task = dragTask.current;
+    if (!task || task.status === newStatus) return;
+    const targetLength = columns[newStatus]?.length ?? 0;
+    await apiFetch(`${API}/${task.id}/move`, { method: "PATCH", body: JSON.stringify({ status: newStatus, order: targetLength }) });
+    if (newStatus === "done") {
+      addHistory({ title: task.title, priority: task.priority, from: task.status });
+    } else if (task.status === "done") {
+      setHistory((prev) => prev.filter((h) => h.taskTitle !== task.title));
+    }
+    loadTasks();
   }
 
-  loadTasks();
-}
+  function scrollToColumn(key) {
+    columnRefs.current[key]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  }
 
-  const allTasks  = Object.values(columns).flat();
-  const totalDone = columns.done?.length ?? 0;
-  const total     = allTasks.length;
-  const progress  = total ? Math.round((totalDone / total) * 100) : 0;
+  const allTasks = Object.values(columns).flat();
+  const counts   = { todo: columns.todo?.length ?? 0, in_progress: columns.in_progress?.length ?? 0, done: columns.done?.length ?? 0 };
 
   if (loading) return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh", color: "#fca5a5", fontFamily: "system-ui, sans-serif", gap: 10 }}>
-      <div style={{ width: 20, height: 20, border: "2px solid #fde8e8", borderTopColor: "#FF2D20", borderRadius: "50%", animation: "spin 0.6s linear infinite" }} />
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh", color: P.purple500, fontFamily: "system-ui, sans-serif", gap: 10 }}>
+      <div style={{ width: 18, height: 18, border: `2px solid ${P.purple100}`, borderTopColor: P.purple600, borderRadius: "50%", animation: "spin 0.6s linear infinite" }} />
       Loading tasks…
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 
   return (
-    <div style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", minHeight: "100vh", background: "linear-gradient(135deg,#fff5f5 0%,#fff 50%,#fef2f2 100%)" }}>
+    <div style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", minHeight: "100vh", background: P.bg }}>
 
-      {/* ── Top Bar ──────────────────────────────────────────── */}
+      {/* ── Navbar ────────────────────────────────────────── */}
       <header style={{
-        background: "#fff",
-        borderBottom: "1px solid #fde8e8",
-        padding: "0 32px",
-        height: 60,
-        display: "flex", alignItems: "center", gap: 16,
-        position: "sticky", top: 0, zIndex: 100,
-        boxShadow: "0 1px 4px rgba(255,45,32,.07)",
+        background: P.white,
+        borderBottom: `1px solid ${P.border}`,
+        padding: "0 24px",
+        height: 56,
+        display: "flex", alignItems: "center", gap: 10,
+        position: "sticky", top: 0, zIndex: 1000,
+        boxShadow: "0 1px 8px rgba(124,58,237,.06)",
       }}>
-        {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginRight: 8 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#fff5f5,#ffe4e4)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,45,32,.15)" }}>
-            <LaravelLogo size={20} />
+        {/* Logo + brand */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginRight: 12 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: P.purple100, display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${P.purple200}` }}>
+            <LaravelLogo size={18} />
           </div>
-          <span style={{ fontWeight: 800, fontSize: 17, color: "#111827", letterSpacing: "-.02em" }}>DailyMe</span>
+          <span style={{ fontWeight: 800, fontSize: 16, color: P.textPrimary, letterSpacing: "-.03em" }}>DailyMe</span>
         </div>
 
-        {/* Stat chips */}
-        <div style={{ display: "flex", gap: 7 }}>
-          {COLUMNS.map((col) => (
-            <div key={col.key} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: col.color, background: col.light, padding: "4px 10px", borderRadius: 20, border: `1px solid ${col.border}` }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: col.dot }} />
-              {columns[col.key]?.length ?? 0} {col.label}
-            </div>
-          ))}
+        <div style={{ width: 1, height: 22, background: P.border, margin: "0 2px" }} />
+
+        {/* Icon nav group */}
+        <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <NavIcon icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} label="Projects" onClick={() => onGoToProjects && onGoToProjects()} />
+          <NavIcon icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>} label="History" onClick={() => setShowHistory((v) => !v)} active={showHistory} badge={history.length} />
+          <Tooltip label="Notifications">
+            <NotificationBell onOpenProject={onGoToProjects} />
+          </Tooltip>
         </div>
 
         <div style={{ flex: 1 }} />
 
-        {/* Progress */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 11, color: "#fca5a5", fontWeight: 600 }}>{progress}% done</span>
-          <div style={{ width: 90, height: 5, background: "#fde8e8", borderRadius: 99 }}>
-            <div style={{ height: "100%", borderRadius: 99, background: "linear-gradient(90deg,#FF2D20,#f87171)", width: `${progress}%`, transition: "width .4s ease" }} />
-          </div>
-        </div>
-
-        {/* History */}
-        <button
-          onClick={() => setShowHistory((v) => !v)}
-          style={{ padding: "7px 13px", borderRadius: 8, border: showHistory ? "none" : "1px solid #fde8e8", background: showHistory ? "#fff5f5" : "#fff", color: showHistory ? "#FF2D20" : "#9ca3af", cursor: "pointer", fontWeight: 600, fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}
-        >
-          🕓 History {history.length > 0 && <span style={{ background: "#FF2D20", color: "#fff", borderRadius: 10, padding: "1px 5px", fontSize: 10 }}>{history.length}</span>}
-        </button>
-
-        {/* Notifications */}
-        <NotificationBell onOpenProject={onGoToProjects} />
-
-        {/* Projects */}
-        <button
-          onClick={() => onGoToProjects && onGoToProjects()}
-          style={{ padding: "7px 13px", borderRadius: 8, border: "1px solid #fde8e8", background: "#fff", color: "#9ca3af", cursor: "pointer", fontWeight: 600, fontSize: 12, display: "flex", alignItems: "center", gap: 5, transition: "all .15s" }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.color = "#FF2D20"; e.currentTarget.style.borderColor = "#fca5a5"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.borderColor = "#fde8e8"; }}
-        >
-          🗂 Projects
-        </button>
-
-        {/* New task */}
+        {/* New task button */}
         <button
           onClick={() => setModal({ task: null, defaultStatus: "todo" })}
-          style={{ padding: "8px 18px", background: "linear-gradient(135deg,#FF2D20,#ff5c52)", color: "#fff", border: "none", borderRadius: 9, cursor: "pointer", fontWeight: 700, fontSize: 13, boxShadow: "0 2px 8px rgba(255,45,32,.3)", transition: "all .2s" }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-1px)"}
-          onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
+          style={{
+            padding: "7px 16px", background: P.purple600, color: "#fff",
+            border: "none", borderRadius: 9, cursor: "pointer",
+            fontWeight: 700, fontSize: 13,
+            boxShadow: `0 2px 8px rgba(124,58,237,.3)`,
+            transition: "all .2s", display: "flex", alignItems: "center", gap: 6,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = "translateY(-1px)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = P.purple600; e.currentTarget.style.transform = "translateY(0)"; }}
         >
-          + New Task
+          <span style={{ fontSize: 16, fontWeight: 400 }}>+</span> New Task
         </button>
 
-        {/* User avatar */}
-        {user && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 8, borderLeft: "1px solid #fde8e8" }}>
-            <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#FF2D20,#f87171)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12 }}>
-              {user.name?.charAt(0).toUpperCase()}
-            </div>
-            <span style={{ fontSize: 13, fontWeight: 500, color: "#374151" }}>{user.name}</span>
-          </div>
-        )}
+        <div style={{ width: 1, height: 22, background: P.border, margin: "0 4px" }} />
 
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          style={{ padding: "7px 13px", background: "none", color: "#9ca3af", border: "1px solid #e5e7eb", borderRadius: 8, cursor: "pointer", fontWeight: 500, fontSize: 12, transition: "all .15s" }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#fee2e2"; e.currentTarget.style.color = "#dc2626"; e.currentTarget.style.borderColor = "#fca5a5"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.borderColor = "#e5e7eb"; }}
-        >
-          Sign out
-        </button>
+        {/* Profile dropdown */}
+        <ProfileDropdown user={user} onLogout={handleLogout} />
       </header>
 
       {error && (
-        <div style={{ margin: "20px 32px 0", padding: "12px 16px", background: "#fee2e2", borderRadius: 10, color: "#991b1b", fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ margin: "16px 28px 0", padding: "11px 16px", background: "#fef3c7", borderRadius: 10, color: "#92400e", fontSize: 13, display: "flex", alignItems: "center", gap: 8, border: "1px solid #fde68a" }}>
           ⚠️ {error}
         </div>
       )}
 
-      {/* ── Board ─────────────────────────────────────────────── */}
-      <div style={{ display: "flex", gap: 0, alignItems: "flex-start", minHeight: "calc(100vh - 60px)" }}>
-        <div style={{ flex: 1, display: "flex", gap: 16, padding: "24px 32px", alignItems: "flex-start", overflowX: "auto" }}>
+      {/* ── Board ─────────────────────────────────────────── */}
+      <div style={{ display: "flex", gap: 0, alignItems: "flex-start", minHeight: "calc(100vh - 56px)" }}>
+        <div style={{ flex: 1, display: "flex", gap: 16, padding: "24px 28px 100px", alignItems: "flex-start", overflowX: "auto" }}>
           {COLUMNS.map((col) => (
-            <KanbanColumn
-              key={col.key} column={col} tasks={columns[col.key] || []}
-              onDrop={handleDrop} onDragOver={handleDragOver} onDragStart={handleDragStart}
-              onDelete={handleDelete} onEdit={(task) => setModal({ task })}
-              onAddClick={(status) => setModal({ task: null, defaultStatus: status })}
-            />
+            <div key={col.key} ref={(el) => (columnRefs.current[col.key] = el)} style={{ flex: 1, minWidth: 300 }}>
+              <KanbanColumn
+                column={col} tasks={columns[col.key] || []}
+                onDrop={handleDrop} onDragOver={handleDragOver} onDragStart={handleDragStart}
+                onDelete={handleDelete} onEdit={(task) => setModal({ task })}
+                onAddClick={(status) => setModal({ task: null, defaultStatus: status })}
+              />
+            </div>
           ))}
         </div>
 
         {showHistory && (
-          <div style={{ width: 300, flexShrink: 0, borderLeft: "1px solid #fde8e8", background: "#fff", minHeight: "calc(100vh - 60px)" }}>
+          <div style={{ width: 290, flexShrink: 0, borderLeft: `1px solid ${P.border}`, background: P.white, minHeight: "calc(100vh - 56px)" }}>
             <TaskHistory history={history} onClear={() => setHistory([])} />
           </div>
         )}
       </div>
+
+      {/* ── Floating anchors ──────────────────────────────── */}
+      <FloatingAnchors counts={counts} total={allTasks.length} onColumnClick={scrollToColumn} />
 
       {modal && (
         <TaskModal task={modal.task} defaultStatus={modal.defaultStatus} onSave={handleSave} onClose={() => setModal(null)} />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import NotificationBell from './NotificationBell';
+import TicketDetail from './TicketDetail';
 
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem('auth_token') || '';
@@ -339,7 +340,7 @@ function InviteModal({ projectId, onDone, onClose }) {
 }
 
 // ─── Ticket Card ──────────────────────────────────────────────────────────────
-function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, onMove, onViewComments, currentColumn }) {
+function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, currentColumn }) {
   const p = PRIORITY_COLORS[ticket.priority] || PRIORITY_COLORS.medium;
 
   // What moves are allowed
@@ -361,7 +362,7 @@ function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, on
         )}
       </div>
 
-      <p style={{ margin: '0 0 6px', fontWeight: 600, fontSize: 14, color: '#111827', lineHeight: 1.4 }}>{ticket.title}</p>
+      <p onClick={() => onViewDetail(ticket)} style={{ margin: '0 0 6px', fontWeight: 600, fontSize: 14, color: '#111827', lineHeight: 1.4, cursor: 'pointer', textDecoration: 'underline dotted' }}>{ticket.title}</p>
       {ticket.description && <p style={{ margin: '0 0 10px', fontSize: 12, color: '#6b7280', lineHeight: 1.5 }}>{ticket.description}</p>}
 
       {/* Assignee */}
@@ -424,6 +425,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
   const [ticketModal, setTicketModal]   = useState(null);
   const [reviewModal, setReviewModal]   = useState(null);
   const [commentsModal, setCommentsModal] = useState(null); // ← NEW
+  const [detailModal, setDetailModal] = useState(null);
   const [inviteModal, setInviteModal]   = useState(false);
   const [error, setError]               = useState(null);
   const [projectData, setProjectData]   = useState(project);
@@ -627,6 +629,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
                   onReview={(t) => setReviewModal(t)}
                   onMove={handleMove}
                   onViewComments={(t) => setCommentsModal(t)}  // ← NEW
+                  onViewDetail={(t) => setDetailModal(t)}
                 />
               ))}
             </div>
@@ -661,6 +664,16 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
           onReplied={() => { setCommentsModal(null); loadBoard(); }}    
         />
       )}
+
+    {detailModal && (
+            <TicketDetail
+              ticket={detailModal}
+              projectId={project.id}
+              isOwner={isOwner}
+              onClose={() => setDetailModal(null)}
+              onRefresh={() => { loadBoard().then(() => setDetailModal(null)); }}
+            />
+          )}
 
       {inviteModal && (
         <InviteModal
