@@ -13,7 +13,7 @@ class TicketCommentController extends Controller
     // POST /api/projects/{project}/tickets/{ticket}/comments
     public function store(Request $request, Project $project, Ticket $ticket): JsonResponse
     {
-        $isOwner = $project->isOwner($request->user()->id);
+        $isOwner  = $project->isOwner($request->user()->id);
         $isMember = $project->isMember($request->user()->id);
 
         if (!$isOwner && !$isMember) {
@@ -44,6 +44,74 @@ class TicketCommentController extends Controller
             $ticket->update(['status' => 'in_progress']);
         }
 
+        // Send notifications
+        $actor = $request->user()->name;
+        $title = $ticket->title;
+        $type  = $validated['type'] ?? 'comment';
+
+        if ($type === 'approve') {
+            // Notify assignee — ticket approved
+            if ($ticket->assigned_to) {
+                $this->createNotification(
+                    $ticket->assigned_to,
+                    $project->id,
+                    $ticket->id,
+                    'approved',
+                    "{$actor} approved your ticket: \"{$title}\""
+                );
+            }
+        } elseif ($type === 'reject') {
+            // Notify assignee — ticket rejected
+            if ($ticket->assigned_to) {
+                $this->createNotification(
+                    $ticket->assigned_to,
+                    $project->id,
+                    $ticket->id,
+                    'rejected',
+                    "{$actor} rejected your ticket: \"{$title}\" — please revise."
+                );
+            }
+        } else {
+            // Regular comment — notify ticket creator
+            if ($ticket->created_by !== $request->user()->id) {
+                $this->createNotification(
+                    $ticket->created_by,
+                    $project->id,
+                    $ticket->id,
+                    'commented',
+                    "{$actor} commented on \"{$title}\""
+                );
+            }
+            // Also notify assignee if different from commenter and creator
+            if (
+                $ticket->assigned_to &&
+                $ticket->assigned_to !== $request->user()->id &&
+                $ticket->assigned_to !== $ticket->created_by
+            ) {
+                $this->createNotification(
+                    $ticket->assigned_to,
+                    $project->id,
+                    $ticket->id,
+                    'commented',
+                    "{$actor} commented on \"{$title}\""
+                );
+            }
+        }
+
         return response()->json($comment->load('user'), 201);
+    }
+
+    private function createNotification(int $userId, int $projectId, ?int $ticketId, string $type, string $message): void
+    {
+        // Don't notify yourself
+        if ($userId === request()->user()->id) return;
+
+        \App\Models\Notification::create([
+            'user_id'    => $userId,
+            'project_id' => $projectId,
+            'ticket_id'  => $ticketId,
+            'type'       => $type,
+            'message'    => $message,
+        ]);
     }
 }

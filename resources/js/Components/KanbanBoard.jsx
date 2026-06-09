@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import NotificationBell from './NotificationBell';
 import TaskHistory from './TaskHistory';
 
 const API = "/api/tasks";
@@ -394,6 +395,9 @@ async function handleDrop(e, newStatus) {
         >
           🕓 History {history.length > 0 && <span style={{ background: "#FF2D20", color: "#fff", borderRadius: 10, padding: "1px 5px", fontSize: 10 }}>{history.length}</span>}
         </button>
+
+        {/* Notifications */}
+        <NotificationBell onOpenProject={onGoToProjects} />
 
         {/* Projects */}
         <button

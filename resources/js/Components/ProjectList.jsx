@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import NotificationBell from './NotificationBell';
 
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem('auth_token') || '';
@@ -102,6 +103,8 @@ export default function ProjectList({ user, onOpenProject, onGoToDaily, onLogout
         <button onClick={onGoToDaily} style={{ padding: '9px 16px', background: 'none', color: '#6b7280', border: '1px solid #e5e7eb', borderRadius: 10, cursor: 'pointer', fontWeight: 500, fontSize: 13 }}>
           📋 Daily Tasks
         </button>
+
+        <NotificationBell onOpenProject={onOpenProject} />
 
         <button onClick={() => setShowModal(true)} style={{ padding: '9px 20px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
           + New Project

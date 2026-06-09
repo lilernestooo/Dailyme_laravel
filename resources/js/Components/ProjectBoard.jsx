@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import NotificationBell from './NotificationBell';
 
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem('auth_token') || '';
@@ -557,6 +558,9 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
                 </>
             )}
             </div>
+
+          {/* Notifications */}
+        <NotificationBell onOpenProject={() => onBack()} />
 
         {/* Owner actions */}
         {isOwner && (

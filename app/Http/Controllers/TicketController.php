@@ -53,6 +53,17 @@ class TicketController extends Controller
             'order'      => $maxOrder + 1,
         ]);
 
+        // Notify assigned member
+        if (!empty($validated['assigned_to'])) {
+            $this->createNotification(
+                $validated['assigned_to'],
+                $project->id,
+                $ticket->id,
+                'assigned',
+                "{$request->user()->name} assigned you a ticket: \"{$ticket->title}\""
+            );
+        }
+
         return response()->json($ticket->load('assignee', 'creator', 'comments.user'), 201);
     }
 
@@ -60,6 +71,8 @@ class TicketController extends Controller
     public function update(Request $request, Project $project, Ticket $ticket): JsonResponse
     {
         $this->authorizeOwner($project, $request);
+
+        $oldAssignee = $ticket->assigned_to;
 
         $validated = $request->validate([
             'title'       => 'sometimes|required|string|max:255',
@@ -69,6 +82,20 @@ class TicketController extends Controller
         ]);
 
         $ticket->update($validated);
+
+        // Notify newly assigned member if assignee changed
+        if (
+            !empty($validated['assigned_to']) &&
+            $validated['assigned_to'] != $oldAssignee
+        ) {
+            $this->createNotification(
+                $validated['assigned_to'],
+                $project->id,
+                $ticket->id,
+                'assigned',
+                "{$request->user()->name} assigned you a ticket: \"{$ticket->title}\""
+            );
+        }
 
         return response()->json($ticket->load('assignee', 'creator', 'comments.user'));
     }
@@ -87,7 +114,7 @@ class TicketController extends Controller
         $oldStatus = $ticket->status;
 
         // Members can only move: todo→in_progress, in_progress→review
-        // Owners can move anywhere including review→done, review→in_progress, done→archived
+        // Owners can move anywhere
         $memberAllowed = [
             'todo'        => ['in_progress'],
             'in_progress' => ['review'],
@@ -105,6 +132,28 @@ class TicketController extends Controller
             ->max('order') ?? -1;
 
         $ticket->update(['status' => $newStatus, 'order' => $maxOrder + 1]);
+
+        // Notify owner when ticket moves to review
+        if ($newStatus === 'review' && !$isOwner) {
+            $this->createNotification(
+                $project->owner_id,
+                $project->id,
+                $ticket->id,
+                'moved_to_review',
+                "{$request->user()->name} moved \"{$ticket->title}\" to Review"
+            );
+        }
+
+        // Notify assignee when owner moves ticket to done
+        if ($newStatus === 'done' && $isOwner && $ticket->assigned_to) {
+            $this->createNotification(
+                $ticket->assigned_to,
+                $project->id,
+                $ticket->id,
+                'approved',
+                "{$request->user()->name} moved \"{$ticket->title}\" to Done"
+            );
+        }
 
         return response()->json($ticket->load('assignee', 'creator', 'comments.user'));
     }
@@ -129,5 +178,19 @@ class TicketController extends Controller
         if ($project->owner_id !== $request->user()->id) {
             abort(403, 'Only the project owner can do this.');
         }
+    }
+
+    private function createNotification(int $userId, int $projectId, ?int $ticketId, string $type, string $message): void
+    {
+        // Don't notify yourself
+        if ($userId === request()->user()->id) return;
+
+        \App\Models\Notification::create([
+            'user_id'    => $userId,
+            'project_id' => $projectId,
+            'ticket_id'  => $ticketId,
+            'type'       => $type,
+            'message'    => $message,
+        ]);
     }
 }

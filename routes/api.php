@@ -6,6 +6,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketCommentController;
+use App\Http\Controllers\NotificationController;
 
 // Public auth routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -24,6 +25,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{task}/move', [TaskController::class, 'move']);
         Route::delete('/{task}',     [TaskController::class, 'destroy']);
     });
+
+    // Notifications
+    Route::get('/notifications',                        [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count',           [NotificationController::class, 'unreadCount']);
+    Route::patch('/notifications/read-all',             [NotificationController::class, 'readAll']);
+    Route::patch('/notifications/{notification}/read',  [NotificationController::class, 'read']);
 
     // Projects
     Route::prefix('projects')->group(function () {
