@@ -154,7 +154,7 @@ function ProfileDropdown({ user, onLogout }) {
 
 // ── Project Modal ──────────────────────────────────────────────────────────
 function ProjectModal({ onSave, onClose }) {
-  const [form, setForm] = useState({ name: '', description: '' });
+  const [form, setForm] = useState({ name: '', description: '', qa_required: false });
   const [loading, setLoading] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const valid = form.name.trim().length > 0;
@@ -197,6 +197,23 @@ function ProjectModal({ onSave, onClose }) {
         <label style={lbl}>Description</label>
         <textarea value={form.description} onChange={set('description')} placeholder="What is this project about?" rows={3}
           style={{ ...field, resize: 'vertical' }} onFocus={focusIn} onBlur={focusOut} />
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 20, cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={form.qa_required}
+            onChange={e => setForm(f => ({ ...f, qa_required: e.target.checked }))}
+            style={{ width: 16, height: 16, accentColor: P.purple600, cursor: 'pointer' }}
+          />
+          <div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: P.textPrimary }}>Require QA review</span>
+            {form.qa_required && (
+              <p style={{ margin: '2px 0 0', fontSize: 11.5, color: P.textMuted }}>
+                Tickets in Review must be passed by a QA member before the owner can mark them Done.
+              </p>
+            )}
+          </div>
+        </label>
 
         <div style={{ display: 'flex', gap: 10, marginTop: 28 }}>
           <button onClick={onClose}
@@ -386,14 +403,24 @@ function ProjectCard({ project, onOpen, onDelete }) {
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
           </svg>
         </div>
-        <span style={{
-          fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
-          background: isOwner ? P.purple100 : '#ecfdf5',
-          color: isOwner ? P.purple600 : '#10b981',
-          border: `1px solid ${isOwner ? P.purple200 : '#a7f3d0'}`,
-        }}>
-          {isOwner ? 'Owner' : 'Member'}
-        </span>
+         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <span style={{
+            fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
+            background: isOwner ? P.purple100 : '#ecfdf5',
+            color: isOwner ? P.purple600 : '#10b981',
+            border: `1px solid ${isOwner ? P.purple200 : '#a7f3d0'}`,
+          }}>
+            {isOwner ? 'Owner' : 'Member'}
+          </span>
+          {project.qa_required && (
+            <span style={{
+              fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
+              background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a',
+            }}>
+              QA
+            </span>
+          )}
+        </div>
       </div>
 
       <h3 style={{ margin: '0 0 5px', fontSize: 15, fontWeight: 700, color: P.textPrimary }}>{project.name}</h3>

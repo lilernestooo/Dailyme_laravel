@@ -9,7 +9,11 @@ class Project extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'owner_id'];
+    protected $fillable = ['name', 'description', 'owner_id', 'qa_required'];  // ← added qa_required
+
+    protected $casts = [
+        'qa_required' => 'boolean',  // ← added
+    ];
 
     public function owner()
     {
@@ -34,5 +38,11 @@ class Project extends Model
     public function isOwner(int $userId): bool
     {
         return $this->owner_id === $userId;
+    }
+
+    // ← added
+    public function isQA(int $userId): bool
+    {
+        return $this->members()->where('user_id', $userId)->where('role', 'qa')->exists();
     }
 }

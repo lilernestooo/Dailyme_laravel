@@ -31,14 +31,16 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
+            'qa_required' => 'boolean',             // ← added
         ]);
 
         $project = Project::create([
-            ...$validated,
-            'owner_id' => $request->user()->id,
+            'name'        => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'owner_id'    => $request->user()->id,
+            'qa_required' => $validated['qa_required'] ?? false,   // ← added
         ]);
 
-        // Add owner as a member with owner role
         ProjectMember::create([
             'project_id' => $project->id,
             'user_id'    => $request->user()->id,
@@ -67,6 +69,7 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name'        => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
+            'qa_required' => 'boolean',             // ← added
         ]);
 
         $project->update($validated);
@@ -89,6 +92,7 @@ class ProjectController extends Controller
 
         $validated = $request->validate([
             'email' => 'required|email|exists:users,email',
+            'role'  => 'in:member,qa',              // ← added (defaults to member if omitted)
         ]);
 
         $user = User::where('email', $validated['email'])->first();
@@ -97,10 +101,15 @@ class ProjectController extends Controller
             return response()->json(['message' => 'User is already a member.'], 422);
         }
 
+        // ← if qa role is requested but project has no QA enabled, block it
+        if (($validated['role'] ?? 'member') === 'qa' && !$project->qa_required) {
+            return response()->json(['message' => 'This project does not have QA enabled.'], 422);
+        }
+
         ProjectMember::create([
             'project_id' => $project->id,
             'user_id'    => $user->id,
-            'role'       => 'member',
+            'role'       => $validated['role'] ?? 'member',   // ← added
         ]);
 
         return response()->json(['message' => 'Member invited successfully.', 'user' => $user]);

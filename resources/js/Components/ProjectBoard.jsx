@@ -151,6 +151,7 @@ const COLUMNS = [
   { key: 'in_progress', label: 'In Progress',  color: '#0ea5e9',    light: '#f0f9ff',   dot: '#38bdf8',    border: '#bae6fd'   },
   { key: 'review',      label: 'Review',       color: '#8b5cf6',    light: '#f5f3ff',   dot: '#a78bfa',    border: '#ddd6fe'   },
   { key: 'done',        label: 'Done',         color: '#10b981',    light: '#ecfdf5',   dot: '#34d399',    border: '#a7f3d0'   },
+  { key: 'qa_approved', label: 'QA Approved',  color: '#f59e0b',    light: '#fffbeb',   dot: '#fbbf24',    border: '#fde68a'   },
   { key: 'archived',    label: 'Archived',     color: '#6b7280',    light: '#f9fafb',   dot: '#9ca3af',    border: '#e5e7eb'   },
 ];
 
@@ -281,21 +282,44 @@ function TicketModal({ ticket, members, onSave, onClose }) {
 }
 
 // ── Review Modal ───────────────────────────────────────────────────────────
-function ReviewModal({ ticket, projectId, onDone, onClose }) {
+function ReviewModal({ ticket, projectId, onDone, onClose, userRole, fromColumn }) {
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
 
   const field = { width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: P.textPrimary, background: P.purple50 };
   const lbl = { display: 'block', fontSize: 11, fontWeight: 700, color: P.textSecondary, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.06em' };
 
-  async function handleAction(type) {
+  async function handleAction(decision) {
     if (!comment.trim()) { alert('Please leave a comment.'); return; }
     setLoading(true);
     try {
-      await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}/comments`, {
-        method: 'POST',
-        body: JSON.stringify({ comment, type }),
-      });
+      if (userRole === 'qa') {
+        // QA reject: post qa_feedback comment first, then move ticket back
+        await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}/comments`, {
+          method: 'POST',
+          body: JSON.stringify({ comment, type: 'qa_feedback' }),
+        });
+        await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}/move`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'in_progress' }),
+        });
+      } else if (userRole === 'owner' && fromColumn === 'qa_approved') {
+        // Owner reject after QA passed: post regular comment, move back to in_progress
+        await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}/comments`, {
+          method: 'POST',
+          body: JSON.stringify({ comment, type: 'reject' }),
+        });
+        await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}/move`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'in_progress' }),
+        });
+      } else {
+        // Owner review on non-QA project: original approve/reject comment flow
+        await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}/comments`, {
+          method: 'POST',
+          body: JSON.stringify({ comment, type: decision }),
+        });
+      }
       onDone();
     } catch {
       alert('Failed to submit review.');
@@ -319,7 +343,9 @@ function ReviewModal({ ticket, projectId, onDone, onClose }) {
             <Icons.ClipboardCheck />
           </div>
           <div>
-            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: '-.02em' }}>Review Ticket</h2>
+          <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: '-.02em' }}>
+              {userRole === 'qa' ? 'QA Rejection Feedback' : fromColumn === 'qa_approved' ? 'Reject After QA' : 'Review Ticket'}
+            </h2>
             <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: P.textSecondary }}>{ticket.title}</p>
           </div>
         </div>
@@ -346,7 +372,9 @@ function ReviewModal({ ticket, projectId, onDone, onClose }) {
         )}
 
         <label style={lbl}>Your Review Comment *</label>
-        <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Leave feedback for the developer…" rows={4} style={{ ...field, resize: 'vertical' }} />
+        <textarea value={comment} onChange={(e) => setComment(e.target.value)}
+          placeholder={userRole === 'qa' ? 'Required: describe what needs to be fixed…' : 'Leave a comment…'}
+          rows={4} style={{ ...field, resize: 'vertical' }} />
 
         <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
           <button onClick={onClose} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: 'pointer', fontWeight: 600, color: P.textSecondary, fontSize: 14 }}
@@ -360,12 +388,14 @@ function ReviewModal({ ticket, projectId, onDone, onClose }) {
             onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}>
             <Icons.X /> Reject
           </button>
-          <button onClick={() => handleAction('approve')} disabled={loading}
-            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#d1fae5', color: '#065f46', cursor: 'pointer', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#a7f3d0'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#d1fae5'}>
-            <Icons.Check /> Approve
-          </button>
+          {userRole !== 'qa' && fromColumn !== 'qa_approved' && (
+            <button onClick={() => handleAction('approve')} disabled={loading}
+              style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#d1fae5', color: '#065f46', cursor: 'pointer', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#a7f3d0'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#d1fae5'}>
+              <Icons.Check /> Approve
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -473,6 +503,7 @@ function CommentsModal({ ticket, projectId, onClose, onReplied }) {
 // ── Invite Modal ───────────────────────────────────────────────────────────
 function InviteModal({ projectId, onDone, onClose }) {
   const [email, setEmail]   = useState('');
+  const [role, setRole]     = useState('member');
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState(null);
 
@@ -487,7 +518,7 @@ function InviteModal({ projectId, onDone, onClose }) {
     try {
       await apiFetch(`/api/projects/${projectId}/invite`, {
         method: 'POST',
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, role }),
       });
       onDone();
     } catch (e) {
@@ -520,9 +551,16 @@ function InviteModal({ projectId, onDone, onClose }) {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="member@example.com"
             style={{ ...field, paddingLeft: 42 }} onFocus={focusIn} onBlur={focusOut}
             onKeyDown={(e) => e.key === 'Enter' && handleInvite()} autoFocus />
-        </div>
-
-        <div style={{ display: 'flex', gap: 10, marginTop: 28 }}>
+            </div>
+    
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: P.textSecondary, marginBottom: 6, marginTop: 16, textTransform: 'uppercase', letterSpacing: '.06em' }}>Role</label>
+            <select value={role} onChange={(e) => setRole(e.target.value)}
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${P.border}`, fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', color: P.textPrimary, background: P.purple50 }}>
+              <option value="member">Developer / Member</option>
+              <option value="qa">QA (Quality Assurance)</option>
+            </select>
+    
+            <div style={{ display: 'flex', gap: 10, marginTop: 28 }}>
           <button onClick={onClose}
             style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: 'pointer', fontWeight: 600, color: P.textSecondary, fontSize: 14, transition: 'all .15s' }}
             onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; e.currentTarget.style.color = P.purple600; }}
@@ -589,11 +627,15 @@ function MembersDropdown({ members, projectData }) {
                   <div style={{ fontSize: 13, fontWeight: 600, color: P.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user?.name}</div>
                   <div style={{ fontSize: 11, color: P.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.user?.email}</div>
                 </div>
-                {m.user?.id === projectData.owner_id && (
+                {m.user?.id === projectData.owner_id ? (
                   <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: P.purple100, color: P.purple600, display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
                     <Icons.Crown /> Owner
                   </span>
-                )}
+                ) : m.role === 'qa' ? (
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a', flexShrink: 0 }}>
+                    QA
+                  </span>
+                ) : null}
               </div>
             ))}
           </div>
@@ -604,12 +646,20 @@ function MembersDropdown({ members, projectData }) {
 }
 
 // ── Ticket Card ────────────────────────────────────────────────────────────
-function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, currentColumn }) {
+function TicketCard({ ticket, isOwner, userRole, qaRequired, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, currentColumn }) {
   const p = PRIORITY[ticket.priority] || PRIORITY.medium;
   const [hover, setHover] = useState(false);
 
   const memberMoves = { todo: 'in_progress', in_progress: 'review' };
-  const targetCol = memberMoves[currentColumn] ? COLUMNS.find(c => c.key === memberMoves[currentColumn]) : null;
+  const qaMoves     = { review: 'qa_approved' };
+
+  // What the current user can move to from this column
+  let targetCol = null;
+  if (userRole === 'member' && memberMoves[currentColumn]) {
+    targetCol = COLUMNS.find(c => c.key === memberMoves[currentColumn]);
+  } else if (userRole === 'qa' && qaRequired && qaMoves[currentColumn]) {
+    targetCol = COLUMNS.find(c => c.key === qaMoves[currentColumn]);
+  }
 
   return (
     <div
@@ -670,9 +720,9 @@ function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, on
         </button>
       )}
 
-      {/* Action buttons */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-        {!isOwner && targetCol && (
+        {/* Member move button: To Do → In Progress → Review */}
+        {userRole === 'member' && targetCol && (
           <button onClick={() => onMove(ticket, targetCol.key)}
             style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: `1px solid ${targetCol.border}`, background: targetCol.light, color: targetCol.color, cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
             onMouseEnter={(e) => e.currentTarget.style.background = targetCol.border}
@@ -681,8 +731,29 @@ function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, on
           </button>
         )}
 
-        {isOwner && currentColumn === 'review' && (
-          <button onClick={() => onReview(ticket)}
+        {/* QA pass button: Review → QA Approved */}
+        {userRole === 'qa' && qaRequired && currentColumn === 'review' && (
+          <button onClick={() => onMove(ticket, 'qa_approved')}
+            style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: 'none', background: '#d1fae5', color: '#065f46', cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#a7f3d0'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#d1fae5'}>
+            <Icons.Check /> Pass
+          </button>
+        )}
+
+        {/* QA reject button: Review → In Progress */}
+        {userRole === 'qa' && qaRequired && currentColumn === 'review' && (
+          <button onClick={() => onReview(ticket, currentColumn)}
+            style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: 'none', background: '#fee2e2', color: '#dc2626', cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#fecaca'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}>
+            <Icons.X /> Reject
+          </button>
+        )}
+
+        {/* Owner review button: only shown if no QA required */}
+        {isOwner && !qaRequired && currentColumn === 'review' && (
+          <button onClick={() => onReview(ticket, currentColumn)}
             style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: 'none', background: P.purple600, color: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, boxShadow: '0 2px 8px rgba(124,58,237,.3)', transition: 'all .15s' }}
             onMouseEnter={(e) => e.currentTarget.style.background = P.purple700}
             onMouseLeave={(e) => e.currentTarget.style.background = P.purple600}>
@@ -690,6 +761,27 @@ function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, on
           </button>
         )}
 
+        {/* Owner approve button: QA Approved → Done */}
+        {isOwner && currentColumn === 'qa_approved' && (
+          <button onClick={() => onMove(ticket, 'done')}
+            style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: 'none', background: '#d1fae5', color: '#065f46', cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#a7f3d0'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#d1fae5'}>
+            <Icons.Check /> Approve → Done
+          </button>
+        )}
+
+        {/* Owner reject from QA Approved → back to In Progress */}
+        {isOwner && currentColumn === 'qa_approved' && (
+          <button onClick={() => onReview(ticket, currentColumn)}
+            style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: 'none', background: '#fee2e2', color: '#dc2626', cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#fecaca'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}>
+            <Icons.X /> Reject
+          </button>
+        )}
+
+        {/* Owner archive button: Done → Archived */}
         {isOwner && currentColumn === 'done' && (
           <button onClick={() => onMove(ticket, 'archived')}
             style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: `1px solid ${P.border}`, background: P.bg, color: P.textSecondary, cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
@@ -704,13 +796,18 @@ function TicketCard({ ticket, isOwner, projectId, onEdit, onDelete, onReview, on
 }
 
 // ── Column ─────────────────────────────────────────────────────────────────
-function BoardColumn({ column, tickets, isOwner, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, onAddClick }) {
+function BoardColumn({ column, tickets, isOwner, userRole, qaRequired, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, onAddClick }) {
   return (
     <div style={{ minWidth: 290, flex: '0 0 290px', background: P.white, borderRadius: 16, border: `1px solid ${column.border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 6px rgba(124,58,237,.05)' }}>
       {/* Header */}
       <div style={{ padding: '13px 16px', background: column.light, borderBottom: `1px solid ${column.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 9, height: 9, borderRadius: '50%', background: column.color, flexShrink: 0 }} />
-        <h3 style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: P.textPrimary, flex: 1, letterSpacing: '.05em', textTransform: 'uppercase' }}>{column.label}</h3>
+        <h3 style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: P.textPrimary, flex: 1, letterSpacing: '.05em', textTransform: 'uppercase' }}>
+          {column.label}
+          {column.key === 'review' && qaRequired && (
+            <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 20, background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a', textTransform: 'uppercase', letterSpacing: '.04em' }}>QA</span>
+          )}
+        </h3>
         <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: column.color, color: '#fff', minWidth: 20, textAlign: 'center' }}>
           {tickets.length}
         </span>
@@ -735,6 +832,8 @@ function BoardColumn({ column, tickets, isOwner, projectId, onEdit, onDelete, on
               key={ticket.id}
               ticket={ticket}
               isOwner={isOwner}
+              userRole={userRole}
+              qaRequired={qaRequired}
               projectId={projectId}
               currentColumn={column.key}
               onEdit={onEdit}
@@ -829,7 +928,7 @@ function ProfileDropdown({ user, onLogout }) {
 
 // ── Main ProjectBoard ──────────────────────────────────────────────────────
 export default function ProjectBoard({ project, user, onBack, onLogout }) {
-  const [columns, setColumns]             = useState({ todo: [], in_progress: [], review: [], done: [], archived: [] });
+  const [columns, setColumns]             = useState({ todo: [], in_progress: [], review: [], qa_approved: [], done: [], archived: [] });
   const [members, setMembers]             = useState([]);
   const [loading, setLoading]             = useState(true);
   const [ticketModal, setTicketModal]     = useState(null);
@@ -841,6 +940,8 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
   const [projectData, setProjectData]     = useState(project);
 
   const isOwner = project.is_owner || project.owner_id === user.id;
+  const isQA    = !isOwner && members.some(m => m.user?.id === user.id && m.role === 'qa');
+  const userRole = isOwner ? 'owner' : isQA ? 'qa' : 'member';
 
   const totalTickets = Object.values(columns).flat().length;
   const doneTickets  = columns.done?.length ?? 0;
@@ -987,16 +1088,18 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
 
       {/* ── Board ───────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: 16, padding: '24px 28px 60px', alignItems: 'flex-start', overflowX: 'auto' }}>
-        {COLUMNS.map((col) => (
+      {COLUMNS.map((col) => (
           <BoardColumn
             key={col.key}
             column={col}
             tickets={columns[col.key] || []}
             isOwner={isOwner}
+            userRole={userRole}
+            qaRequired={projectData.qa_required}
             projectId={project.id}
             onEdit={(t) => setTicketModal({ ticket: t })}
             onDelete={handleDelete}
-            onReview={(t) => setReviewModal(t)}
+            onReview={(t, fromColumn) => setReviewModal({ ticket: t, fromColumn })}
             onMove={handleMove}
             onViewComments={(t) => setCommentsModal(t)}
             onViewDetail={(t) => setDetailModal(t)}
@@ -1010,7 +1113,14 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
         <TicketModal ticket={ticketModal.ticket} members={members} onSave={handleSaveTicket} onClose={() => setTicketModal(null)} />
       )}
       {reviewModal && (
-        <ReviewModal ticket={reviewModal} projectId={project.id} onDone={() => { setReviewModal(null); loadBoard(); }} onClose={() => setReviewModal(null)} />
+        <ReviewModal
+          ticket={reviewModal.ticket}
+          projectId={project.id}
+          userRole={userRole}
+          fromColumn={reviewModal.fromColumn}
+          onDone={() => { setReviewModal(null); loadBoard(); }}
+          onClose={() => setReviewModal(null)}
+        />
       )}
       {commentsModal && (
         <CommentsModal ticket={commentsModal} projectId={project.id} onClose={() => setCommentsModal(null)} onReplied={() => { setCommentsModal(null); loadBoard(); }} />

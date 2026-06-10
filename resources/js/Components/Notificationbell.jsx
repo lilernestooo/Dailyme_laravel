@@ -32,6 +32,10 @@ const TYPE_STYLES = {
   approved:        { icon: '✅', color: '#10b981', bg: '#ecfdf5' },
   rejected:        { icon: '❌', color: '#ef4444', bg: '#fee2e2' },
   commented:       { icon: '💬', color: '#f59e0b', bg: '#fffbeb' },
+  qa_review_needed: { icon: '🔍', color: '#8b5cf6', bg: '#f5f3ff' },
+  qa_passed:        { icon: '✅', color: '#10b981', bg: '#ecfdf5' },
+  qa_rejected:      { icon: '❌', color: '#ef4444', bg: '#fee2e2' },
+  qa_feedback:      { icon: '📝', color: '#f59e0b', bg: '#fffbeb' },
 };
 
 export default function NotificationBell({ onOpenProject }) {
