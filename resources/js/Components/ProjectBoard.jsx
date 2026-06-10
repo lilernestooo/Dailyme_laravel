@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NotificationBell from './NotificationBell';
 import TicketDetail from './TicketDetail';
 
@@ -763,6 +763,70 @@ function BoardColumn({ column, tickets, isOwner, projectId, onEdit, onDelete, on
   );
 }
 
+function ProfileDropdown({ user, onLogout }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const initial = user?.name?.charAt(0).toUpperCase() || "U";
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          width: 34, height: 34, borderRadius: "50%",
+          background: open ? P.purple600 : P.purple500,
+          border: open ? `2px solid ${P.purple300}` : "2px solid transparent",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "#fff", fontWeight: 700, fontSize: 13,
+          cursor: "pointer", transition: "all .15s",
+          boxShadow: open ? `0 0 0 3px ${P.purple100}` : "none",
+        }}
+      >
+        {initial}
+      </button>
+
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 10px)", right: 0,
+          background: P.white, border: `1px solid ${P.purple200}`,
+          borderRadius: 14, boxShadow: "0 8px 30px rgba(124,58,237,.12)",
+          minWidth: 200, overflow: "hidden", zIndex: 1001,
+        }}>
+          <div style={{ padding: "16px 16px 12px", borderBottom: `1px solid ${P.border}`, display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 38, height: 38, borderRadius: "50%", background: P.purple500, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
+              {initial}
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 13.5, color: P.textPrimary }}>{user?.name || "User"}</div>
+              <div style={{ fontSize: 11.5, color: P.textMuted }}>{user?.email || ""}</div>
+            </div>
+          </div>
+          <div style={{ padding: "6px 0" }}>
+            <button
+              onClick={onLogout}
+              style={{ width: "100%", padding: "9px 16px", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "#dc2626", textAlign: "left", transition: "background .12s" }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "#fff5f5"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main ProjectBoard ──────────────────────────────────────────────────────
 export default function ProjectBoard({ project, user, onBack, onLogout }) {
   const [columns, setColumns]             = useState({ todo: [], in_progress: [], review: [], done: [], archived: [] });
@@ -917,28 +981,9 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
 
         <div style={{ width: 1, height: 22, background: P.border, margin: '0 2px' }} />
 
-        {/* User avatar + signout */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 34, height: 34, borderRadius: '50%', background: P.purple500, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, border: `2px solid ${P.purple300}` }}>
-            {user?.name?.charAt(0).toUpperCase()}
-          </div>
-        </div>
-
-        <Tooltip label="Sign out">
-          <button onClick={onLogout}
-            style={{ width: 36, height: 36, borderRadius: 10, border: '1.5px solid transparent', background: 'transparent', color: P.textSecondary, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.borderColor = '#fecaca'; e.currentTarget.style.color = '#dc2626'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = P.textSecondary; }}>
-            <Icons.LogOut />
-          </button>
-        </Tooltip>
+     
+        <ProfileDropdown user={user} onLogout={onLogout} />
       </header>
-
-      {error && (
-        <div style={{ margin: '16px 28px 0', padding: '11px 16px', background: '#fef3c7', borderRadius: 10, color: '#92400e', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, border: '1px solid #fde68a' }}>
-          ⚠ {error}
-        </div>
-      )}
 
       {/* ── Board ───────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: 16, padding: '24px 28px 60px', alignItems: 'flex-start', overflowX: 'auto' }}>
