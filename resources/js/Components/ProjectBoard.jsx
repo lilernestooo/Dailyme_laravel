@@ -1037,27 +1037,16 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
           </button>
         </Tooltip>
 
-        <div style={{ width: 1, height: 22, background: P.border, margin: '0 2px' }} />
+       {/*<div style={{ width: 1, height: 22, background: P.border, margin: '0 2px' }} />*/}
 
-        {/* Project info */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <span style={{ fontWeight: 700, fontSize: 14, color: P.textPrimary, letterSpacing: '-.02em', lineHeight: 1 }}>{projectData.name}</span>
-          <span style={{ fontSize: 11, color: P.textMuted, lineHeight: 1 }}>{doneTickets}/{totalTickets} done · {progress}%</span>
-        </div>
-
-        {/* Progress bar */}
-        <div style={{ width: 80, height: 4, background: P.purple100, borderRadius: 99, marginLeft: 4 }}>
-          <div style={{ height: '100%', borderRadius: 99, background: P.purple500, width: `${progress}%`, transition: 'width .4s ease' }} />
-        </div>
-
-        <div style={{ flex: 1 }} />
-
-        {/* Notifications */}
-          <Tooltip label="Notifications">
+        {/* Notifications — moved next to back button */}
+        <Tooltip label="Notifications">
           <NotificationBell onOpenProject={() => onBack()} />
         </Tooltip>
 
-        <div style={{ width: 1, height: 22, background: P.border, margin: '0 2px' }} />
+        {/*<div style={{ width: 1, height: 22, background: P.border, margin: '0 2px' }} />*/}
+
+        <div style={{ flex: 1 }} />
 
         {/* Members dropdown */}
        <MembersDropdown members={members} projectData={projectData} />
@@ -1086,8 +1075,39 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
         <ProfileDropdown user={user} onLogout={onLogout} />
       </header>
 
+      {/* ── Floating project anchor ──────────────────────────────────────── */}
+      <div style={{
+        position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 999, display: 'flex', alignItems: 'center', gap: 12,
+        background: P.white, border: `1px solid ${P.purple200}`,
+        borderRadius: 999, padding: '8px 18px 8px 12px',
+        boxShadow: '0 4px 24px rgba(124,58,237,.15), 0 1px 4px rgba(0,0,0,.06)',
+        backdropFilter: 'blur(8px)',
+        minWidth: 260, maxWidth: 400,
+      }}>
+        {/* Icon */}
+        <div style={{ width: 30, height: 30, borderRadius: '50%', background: P.purple100, border: `1px solid ${P.purple200}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <LaravelLogo size={16} />
+        </div>
+        {/* Name + bar */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontWeight: 700, fontSize: 12, color: P.textPrimary, letterSpacing: '-.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 4 }}>
+            {projectData.name}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <div style={{ flex: 1, height: 4, background: P.purple100, borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{ height: '100%', borderRadius: 99, background: P.purple600, width: `${progress}%`, transition: 'width .5s ease' }} />
+            </div>
+            <span style={{ fontSize: 10, fontWeight: 700, color: P.purple600, whiteSpace: 'nowrap' }}>
+              {doneTickets}/{totalTickets} · {progress}%
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* ── Board ───────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: 16, padding: '24px 28px 60px', alignItems: 'flex-start', overflowX: 'auto' }}>
+
       {COLUMNS.map((col) => (
           <BoardColumn
             key={col.key}
