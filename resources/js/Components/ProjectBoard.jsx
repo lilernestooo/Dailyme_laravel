@@ -198,6 +198,7 @@ function TicketModal({ ticket, members, onSave, onClose }) {
     description: ticket?.description || '',
     priority:    ticket?.priority    || 'medium',
     assigned_to: ticket?.assigned_to || '',
+    progress:    ticket?.progress    ?? 0,
   });
   const [loading, setLoading] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -257,6 +258,19 @@ function TicketModal({ ticket, members, onSave, onClose }) {
                 <option key={m.user.id} value={m.user.id}>{m.user.name}</option>
               ))}
             </select>
+          </div>
+        </div>
+
+        <label style={lbl}>Progress — {form.progress}%</label>
+        <div style={{ padding: '4px 0 8px' }}>
+          <input
+            type="range" min={0} max={100} step={5}
+            value={form.progress}
+            onChange={(e) => setForm((f) => ({ ...f, progress: Number(e.target.value) }))}
+            style={{ width: '100%', accentColor: P.purple600, cursor: 'pointer' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: P.textMuted, marginTop: 2 }}>
+            <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
           </div>
         </div>
 
@@ -645,8 +659,102 @@ function MembersDropdown({ members, projectData }) {
   );
 }
 
+// ── Progress Modal ─────────────────────────────────────────────────────────
+function ProgressModal({ ticket, projectId, onDone, onClose }) {
+  const [progress, setProgress] = useState(ticket.progress ?? 0);
+  const [loading, setLoading]   = useState(false);
+
+  async function handleSave() {
+    setLoading(true);
+    try {
+      await apiFetch(`/api/projects/${projectId}/tickets/${ticket.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ progress }),
+      });
+      onDone();
+    } catch {
+      alert('Failed to update progress.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const pColor = progress === 100 ? '#10b981' : progress >= 50 ? P.purple600 : '#f59e0b';
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(107,114,128,.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
+      <div style={{ background: P.white, borderRadius: 20, padding: 32, width: 420, maxWidth: '94vw', boxShadow: '0 8px 40px rgba(124,58,237,.12)', border: `1px solid ${P.purple200}` }} onClick={(e) => e.stopPropagation()}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${P.purple200}`, color: P.purple600 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: '-.02em' }}>Update Progress</h2>
+            <p style={{ margin: 0, fontSize: 12, color: P.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 280 }}>{ticket.title}</p>
+          </div>
+        </div>
+
+        {/* Big percentage display */}
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ fontSize: 52, fontWeight: 800, color: pColor, letterSpacing: '-.04em', lineHeight: 1, transition: 'color .2s' }}>
+            {progress}%
+          </div>
+          <div style={{ fontSize: 12, color: P.textMuted, marginTop: 4 }}>
+            {progress === 0 ? 'Not started' : progress === 100 ? 'Complete!' : progress >= 75 ? 'Almost there' : progress >= 50 ? 'Halfway through' : progress >= 25 ? 'Just getting started' : 'Early stages'}
+          </div>
+        </div>
+
+        {/* Progress bar preview */}
+        <div style={{ height: 8, background: P.purple100, borderRadius: 99, marginBottom: 16, overflow: 'hidden' }}>
+          <div style={{ height: '100%', borderRadius: 99, background: pColor, width: `${progress}%`, transition: 'width .2s ease, background .2s' }} />
+        </div>
+
+        {/* Slider */}
+        <input
+          type="range" min={0} max={100} step={5}
+          value={progress}
+          onChange={(e) => setProgress(Number(e.target.value))}
+          style={{ width: '100%', accentColor: P.purple600, cursor: 'pointer', marginBottom: 8 }}
+        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: P.textMuted, marginBottom: 24 }}>
+          <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+        </div>
+
+        {/* Quick select */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 24 }}>
+          {[0, 25, 50, 75, 100].map((v) => (
+            <button key={v} onClick={() => setProgress(v)}
+              style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: `1.5px solid ${progress === v ? P.purple400 : P.border}`, background: progress === v ? P.purple50 : P.white, color: progress === v ? P.purple600 : P.textMuted, fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all .15s' }}>
+              {v}%
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={onClose}
+            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1px solid ${P.border}`, background: P.white, cursor: 'pointer', fontWeight: 600, color: P.textSecondary, fontSize: 14 }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple300; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = P.white; e.currentTarget.style.borderColor = P.border; }}>
+            Cancel
+          </button>
+          <button onClick={handleSave} disabled={loading}
+            style={{ flex: 2, padding: '11px 0', borderRadius: 12, border: 'none', background: P.purple600, color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 16px rgba(124,58,237,.3)', transition: 'all .2s' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = P.purple700}
+            onMouseLeave={(e) => e.currentTarget.style.background = P.purple600}>
+            {loading ? 'Saving…' : 'Save Progress'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Ticket Card ────────────────────────────────────────────────────────────
-function TicketCard({ ticket, isOwner, userRole, qaRequired, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, currentColumn }) {
+function TicketCard({ ticket, isOwner, userRole, qaRequired, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, onUpdateProgress, currentColumn }) {
   const p = PRIORITY[ticket.priority] || PRIORITY.medium;
   const [hover, setHover] = useState(false);
 
@@ -710,6 +818,23 @@ function TicketCard({ ticket, isOwner, userRole, qaRequired, projectId, onEdit, 
         </div>
       )}
 
+      {/* Progress bar */}
+      {(() => {
+        const prog = ticket.progress ?? 0;
+        const progColor = prog === 100 ? '#10b981' : prog >= 50 ? P.purple600 : '#f59e0b';
+        return (
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: P.textMuted, textTransform: 'uppercase', letterSpacing: '.04em' }}>Progress</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: progColor }}>{prog}%</span>
+            </div>
+            <div style={{ height: 5, background: P.purple100, borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{ height: '100%', borderRadius: 99, background: progColor, width: `${prog}%`, transition: 'width .4s ease' }} />
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Comments badge */}
       {ticket.comments?.length > 0 && (
         <button onClick={() => onViewComments(ticket)}
@@ -721,6 +846,18 @@ function TicketCard({ ticket, isOwner, userRole, qaRequired, projectId, onEdit, 
       )}
 
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+
+        {/* Progress update button — members and QA */}
+        {(userRole === 'member' || userRole === 'qa') && (
+          <button onClick={() => onUpdateProgress(ticket)}
+            style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: `1px solid ${P.purple200}`, background: P.purple50, color: P.purple600, cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = P.purple100}
+            onMouseLeave={(e) => e.currentTarget.style.background = P.purple50}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Update Progress
+          </button>
+        )}
+
         {/* Member move button: To Do → In Progress → Review */}
         {userRole === 'member' && targetCol && (
           <button onClick={() => onMove(ticket, targetCol.key)}
@@ -796,7 +933,7 @@ function TicketCard({ ticket, isOwner, userRole, qaRequired, projectId, onEdit, 
 }
 
 // ── Column ─────────────────────────────────────────────────────────────────
-function BoardColumn({ column, tickets, isOwner, userRole, qaRequired, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, onAddClick }) {
+function BoardColumn({ column, tickets, isOwner, userRole, qaRequired, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, onUpdateProgress, onAddClick }) {
   return (
     <div style={{ minWidth: 290, flex: '0 0 290px', background: P.white, borderRadius: 16, border: `1px solid ${column.border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 6px rgba(124,58,237,.05)' }}>
       {/* Header */}
@@ -842,6 +979,7 @@ function BoardColumn({ column, tickets, isOwner, userRole, qaRequired, projectId
               onMove={onMove}
               onViewComments={onViewComments}
               onViewDetail={onViewDetail}
+              onUpdateProgress={onUpdateProgress}
             />
           ))
         )}
@@ -936,6 +1074,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
   const [commentsModal, setCommentsModal] = useState(null);
   const [detailModal, setDetailModal]     = useState(null);
   const [inviteModal, setInviteModal]     = useState(false);
+  const [progressModal, setProgressModal] = useState(null);
   const [error, setError]                 = useState(null);
   const [projectData, setProjectData]     = useState(project);
 
@@ -1120,6 +1259,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
             onEdit={(t) => setTicketModal({ ticket: t })}
             onDelete={handleDelete}
             onReview={(t, fromColumn) => setReviewModal({ ticket: t, fromColumn })}
+            onUpdateProgress={(t) => setProgressModal(t)}
             onMove={handleMove}
             onViewComments={(t) => setCommentsModal(t)}
             onViewDetail={(t) => setDetailModal(t)}
@@ -1150,6 +1290,9 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
       )}
       {inviteModal && (
         <InviteModal projectId={project.id} onDone={() => { setInviteModal(false); loadBoard(); }} onClose={() => setInviteModal(false)} />
+      )}
+      {progressModal && (
+        <ProgressModal ticket={progressModal} projectId={project.id} onDone={() => { setProgressModal(null); loadBoard(); }} onClose={() => setProgressModal(null)} />
       )}
     </div>
   );

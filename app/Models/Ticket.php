@@ -18,6 +18,7 @@ class Ticket extends Model
         'status',
         'priority',
         'order',
+        'progress',
     ];
 
     public function project()

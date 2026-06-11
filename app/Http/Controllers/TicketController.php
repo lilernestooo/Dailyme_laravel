@@ -24,7 +24,7 @@ class TicketController extends Controller
             'todo'        => $tickets->get('todo', collect()),
             'in_progress' => $tickets->get('in_progress', collect()),
             'review'      => $tickets->get('review', collect()),
-            'qa_approved' => $tickets->get('qa_approved', collect()),  // ← added
+            'qa_approved' => $tickets->get('qa_approved', collect()),
             'done'        => $tickets->get('done', collect()),
             'archived'    => $tickets->get('archived', collect()),
         ]);
@@ -40,6 +40,7 @@ class TicketController extends Controller
             'description' => 'nullable|string',
             'priority'    => 'in:low,medium,high',
             'assigned_to' => 'nullable|exists:users,id',
+            'progress'    => 'integer|min:0|max:100',
         ]);
 
         $maxOrder = Ticket::where('project_id', $project->id)
@@ -52,6 +53,7 @@ class TicketController extends Controller
             'created_by' => $request->user()->id,
             'status'     => 'todo',
             'order'      => $maxOrder + 1,
+            'progress'   => $validated['progress'] ?? 0,
         ]);
 
         if (!empty($validated['assigned_to'])) {
@@ -67,11 +69,28 @@ class TicketController extends Controller
         return response()->json($ticket->load('assignee', 'creator', 'comments.user'), 201);
     }
 
-    // PUT /api/projects/{project}/tickets/{ticket} — owner only
+    // PUT /api/projects/{project}/tickets/{ticket}
     public function update(Request $request, Project $project, Ticket $ticket): JsonResponse
     {
-        $this->authorizeOwner($project, $request);
+        $userId  = $request->user()->id;
+        $isOwner = $project->isOwner($userId);
+        $isQA    = $project->isQA($userId);
 
+        // Must be at least a member
+        if (!$isOwner && !$project->isMember($userId)) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Members and QA can only update progress
+        if (!$isOwner) {
+            $validated = $request->validate([
+                'progress' => 'required|integer|min:0|max:100',
+            ]);
+            $ticket->update(['progress' => $validated['progress']]);
+            return response()->json($ticket->load('assignee', 'creator', 'comments.user'));
+        }
+
+        // Owner can update everything
         $oldAssignee = $ticket->assigned_to;
 
         $validated = $request->validate([
@@ -79,14 +98,12 @@ class TicketController extends Controller
             'description' => 'nullable|string',
             'priority'    => 'in:low,medium,high',
             'assigned_to' => 'nullable|exists:users,id',
+            'progress'    => 'integer|min:0|max:100',
         ]);
 
         $ticket->update($validated);
 
-        if (
-            !empty($validated['assigned_to']) &&
-            $validated['assigned_to'] != $oldAssignee
-        ) {
+        if (!empty($validated['assigned_to']) && $validated['assigned_to'] != $oldAssignee) {
             $this->createNotification(
                 $validated['assigned_to'],
                 $project->id,
@@ -105,13 +122,13 @@ class TicketController extends Controller
         $this->authorizeMember($project, $request);
 
         $validated = $request->validate([
-            'status' => 'required|in:todo,in_progress,review,qa_approved,done,archived',  // ← added qa_approved
+            'status' => 'required|in:todo,in_progress,review,qa_approved,done,archived',
         ]);
 
-        $user      = $request->user();
-        $newStatus = $validated['status'];
-        $oldStatus = $ticket->status;
-        $isOwner   = $project->isOwner($user->id);
+        $user       = $request->user();
+        $newStatus  = $validated['status'];
+        $oldStatus  = $ticket->status;
+        $isOwner    = $project->isOwner($user->id);
         $qaRequired = $project->qa_required;
 
         // Derive role
@@ -126,7 +143,6 @@ class TicketController extends Controller
         $allowed = false;
 
         if ($role === 'owner') {
-            // Owner cannot bypass QA — only QA can move out of review in QA projects
             if ($qaRequired && $oldStatus === 'review' && in_array($newStatus, ['in_progress', 'done'])) {
                 abort(403, 'QA must review this ticket first.');
             }
@@ -148,7 +164,6 @@ class TicketController extends Controller
             if ($oldStatus !== 'review') {
                 abort(403, 'QA can only act on tickets in Review.');
             }
-            // QA can pass (→ qa_approved) or reject (→ in_progress)
             $allowed = in_array($newStatus, ['qa_approved', 'in_progress']);
         }
 
@@ -164,10 +179,8 @@ class TicketController extends Controller
 
         // ---- Notifications ----
 
-        // Ticket moved to Review
         if ($newStatus === 'review') {
             if ($qaRequired) {
-                // Notify all QA members
                 $qaMembers = $project->members()->where('role', 'qa')->get();
                 foreach ($qaMembers as $qaMember) {
                     $this->createNotification(
@@ -179,7 +192,6 @@ class TicketController extends Controller
                     );
                 }
             } else {
-                // No QA — notify owner as before
                 $this->createNotification(
                     $project->owner_id,
                     $project->id,
@@ -190,7 +202,6 @@ class TicketController extends Controller
             }
         }
 
-        // QA passed → notify owner
         if ($newStatus === 'qa_approved') {
             $this->createNotification(
                 $project->owner_id,
@@ -201,7 +212,6 @@ class TicketController extends Controller
             );
         }
 
-        // QA rejected → notify owner and assignee
         if ($role === 'qa' && $newStatus === 'in_progress') {
             $this->createNotification(
                 $project->owner_id,
@@ -221,7 +231,6 @@ class TicketController extends Controller
             }
         }
 
-        // Owner approved after QA → notify assignee
         if ($role === 'owner' && $newStatus === 'done' && $ticket->assigned_to) {
             $this->createNotification(
                 $ticket->assigned_to,
