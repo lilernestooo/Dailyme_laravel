@@ -278,10 +278,10 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
         <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: column.color, color: "#fff", minWidth: 20, textAlign: "center" }}>
           {tasks.length}
         </span>
-        <button
+       {/*<button
           onClick={() => onAddClick(column.key)}
           style={{ background: column.color, border: "none", cursor: "pointer", borderRadius: 6, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 15, lineHeight: 1 }}
-        >+</button>
+          >+</button>*/}
       </div>
 
       {/* Tasks */}
@@ -304,8 +304,7 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
         )}
       </div>
 
-      {/* Footer */}
-      <div style={{ borderTop: `1px solid ${P.border}`, padding: "9px 16px" }}>
+      {/* <div style={{ borderTop: `1px solid ${P.border}`, padding: "9px 16px" }}>
         <button
           onClick={() => onAddClick(column.key)}
           style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12.5, color: P.textMuted, display: "flex", alignItems: "center", gap: 5, fontFamily: "inherit", padding: 0, transition: "color .15s" }}
@@ -314,7 +313,7 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
         >
           <span style={{ fontSize: 15, fontWeight: 700 }}>+</span> Add task
         </button>
-      </div>
+      </div>*/}
     </div>
   );
 }
