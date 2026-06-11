@@ -17,7 +17,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me',      [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Daily tasks (existing)
+    // Daily tasks
     Route::prefix('tasks')->group(function () {
         Route::get('/',              [TaskController::class, 'index']);
         Route::post('/',             [TaskController::class, 'store']);
@@ -26,11 +26,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{task}',     [TaskController::class, 'destroy']);
     });
 
-    // Notifications
-    Route::get('/notifications',                        [NotificationController::class, 'index']);
-    Route::get('/notifications/unread-count',           [NotificationController::class, 'unreadCount']);
-    Route::patch('/notifications/read-all',             [NotificationController::class, 'readAll']);
-    Route::patch('/notifications/{notification}/read',  [NotificationController::class, 'read']);
+    // Notifications — static routes MUST come before {notification} wildcard
+    Route::get('/notifications',                          [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count',             [NotificationController::class, 'unreadCount']);
+    Route::patch('/notifications/read-all',               [NotificationController::class, 'readAll']);
+    Route::delete('/notifications/clear-all',             [NotificationController::class, 'clearAll']);
+    Route::patch('/notifications/{notification}/read',    [NotificationController::class, 'read']);
+    Route::delete('/notifications/{notification}',        [NotificationController::class, 'destroy']);
 
     // Projects
     Route::prefix('projects')->group(function () {

@@ -1086,9 +1086,9 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
         minWidth: 260, maxWidth: 400,
       }}>
         {/* Icon */}
-        <div style={{ width: 30, height: 30, borderRadius: '50%', background: P.purple100, border: `1px solid ${P.purple200}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        {/*<div style={{ width: 30, height: 30, borderRadius: '50%', background: P.purple100, border: `1px solid ${P.purple200}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <LaravelLogo size={16} />
-        </div>
+         </div>*/}
         {/* Name + bar */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 700, fontSize: 12, color: P.textPrimary, letterSpacing: '-.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 4 }}>

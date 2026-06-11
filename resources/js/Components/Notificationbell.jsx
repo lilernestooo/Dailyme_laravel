@@ -92,6 +92,20 @@ export default function NotificationBell({ onOpenProject }) {
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, is_read: true } : n));
   }
 
+  async function clearAll() {
+    await apiFetch('/api/notifications/clear-all', { method: 'DELETE' });
+    setNotifications([]);
+    setUnreadCount(0);
+  }
+
+  async function deleteOne(e, id) {
+    e.stopPropagation();
+    const wasUnread = notifications.find((n) => n.id === id && !n.is_read);
+    await apiFetch(`/api/notifications/${id}`, { method: 'DELETE' });
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    setUnreadCount((c) => wasUnread ? Math.max(0, c - 1) : c);
+  }
+
   function formatTime(dateStr) {
     const diff  = Date.now() - new Date(dateStr).getTime();
     const mins  = Math.floor(diff / 60000);
@@ -154,11 +168,21 @@ export default function NotificationBell({ onOpenProject }) {
                 </span>
               )}
             </h3>
-            {unreadCount > 0 && (
-              <button onClick={markAllRead} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: P.purple600, fontWeight: 600 }}>
-                Mark all read
-              </button>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {unreadCount > 0 && (
+                <button onClick={markAllRead} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: P.purple600, fontWeight: 600, fontFamily: 'inherit' }}>
+                  Mark all read
+                </button>
+              )}
+              {notifications.length > 0 && (
+                <button onClick={clearAll}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#dc2626', fontWeight: 600, fontFamily: 'inherit' }}
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = '.7'}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
+                  Clear all
+                </button>
+              )}
+            </div>
           </div>
 
           {/* List */}
@@ -212,10 +236,24 @@ export default function NotificationBell({ onOpenProject }) {
                       </div>
                     </div>
 
-                    {/* Unread dot */}
-                    {!n.is_read && (
-                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: P.purple600, flexShrink: 0, marginTop: 4 }} />
-                    )}
+                    {/* Unread dot + delete */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                      {!n.is_read && (
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: P.purple600 }} />
+                      )}
+                      <button
+                        onClick={(e) => deleteOne(e, n.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: P.textMuted, padding: 2, borderRadius: 4, display: 'flex', alignItems: 'center', opacity: 0, transition: 'opacity .15s' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.color = '#dc2626'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0'; e.currentTarget.style.color = P.textMuted; }}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                          <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 );
               })

@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 
 class NotificationController extends Controller
 {
-    // GET /api/notifications — get all unread notifications
+    // GET /api/notifications
     public function index(Request $request): JsonResponse
     {
         $notifications = Notification::where('user_id', $request->user()->id)
@@ -30,7 +30,7 @@ class NotificationController extends Controller
         return response()->json(['count' => $count]);
     }
 
-    // PATCH /api/notifications/read-all — mark all as read
+    // PATCH /api/notifications/read-all
     public function readAll(Request $request): JsonResponse
     {
         Notification::where('user_id', $request->user()->id)
@@ -40,7 +40,7 @@ class NotificationController extends Controller
         return response()->json(['message' => 'All marked as read']);
     }
 
-    // PATCH /api/notifications/{id}/read — mark one as read
+    // PATCH /api/notifications/{notification}/read
     public function read(Request $request, Notification $notification): JsonResponse
     {
         if ($notification->user_id !== $request->user()->id) {
@@ -48,5 +48,22 @@ class NotificationController extends Controller
         }
         $notification->update(['is_read' => true]);
         return response()->json($notification);
+    }
+
+    // DELETE /api/notifications/{notification}
+    public function destroy(Request $request, Notification $notification): JsonResponse
+    {
+        if ($notification->user_id !== $request->user()->id) {
+            abort(403);
+        }
+        $notification->delete();
+        return response()->json(['message' => 'Notification deleted']);
+    }
+
+    // DELETE /api/notifications/clear-all
+    public function clearAll(Request $request): JsonResponse
+    {
+        Notification::where('user_id', $request->user()->id)->delete();
+        return response()->json(['message' => 'All notifications cleared']);
     }
 }
