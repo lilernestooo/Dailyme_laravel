@@ -35,4 +35,6 @@ return [
         ],
     ],
 
+    'seeder_password' => env('SEEDER_DEFAULT_PASSWORD', 'password'),
+
 ];
