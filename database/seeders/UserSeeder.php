@@ -19,30 +19,35 @@ class UserSeeder extends Seeder
                 'email'             => 'admin@example.com',
                 'password'          => Hash::make($password),
                 'email_verified_at' => now(),
+                'is_admin'          => true,
             ],
             [
                 'name'              => 'QA Engineer',
                 'email'             => 'qa@example.com',
                 'password'          => Hash::make($password),
                 'email_verified_at' => now(),
+                'is_admin'          => false,
             ],
             [
                 'name'              => 'Developer One',
                 'email'             => 'dev1@example.com',
                 'password'          => Hash::make($password),
                 'email_verified_at' => now(),
+                'is_admin'          => false,
             ],
             [
                 'name'              => 'Developer Two',
                 'email'             => 'dev2@example.com',
                 'password'          => Hash::make($password),
                 'email_verified_at' => now(),
+                'is_admin'          => false,
             ],
             [
                 'name'              => 'Project Manager',
                 'email'             => 'pm@example.com',
                 'password'          => Hash::make($password),
                 'email_verified_at' => now(),
+                'is_admin'          => false,
             ],
         ];
 
