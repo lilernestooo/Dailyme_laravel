@@ -5,12 +5,13 @@ import Login from './Pages/Auth/Login';
 import Register from './Pages/Auth/Register';
 import ProjectList from './Components/ProjectList';
 import ProjectBoard from './Components/ProjectBoard';
+import AdminDashboard from './Components/AdminDashboard';
 
 function App() {
-  const [user, setUser]             = useState(null);
-  const [page, setPage]             = useState('login');
-  const [checking, setChecking]     = useState(true);
-  const [view, setView]             = useState('daily');
+  const [user, setUser]                   = useState(null);
+  const [page, setPage]                   = useState('login');
+  const [checking, setChecking]           = useState(true);
+  const [view, setView]                   = useState('daily');
   const [activeProject, setActiveProject] = useState(null);
 
   useEffect(() => {
@@ -41,8 +42,9 @@ function App() {
   }
 
   if (checking) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'system-ui', color: '#6b7280' }}>
-      Loading...
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'system-ui', color: '#8b5cf6', gap: 10 }}>
+      <div style={{ width: 18, height: 18, border: '2px solid #ede9fe', borderTopColor: '#7c3aed', borderRadius: '50%', animation: 'spin .6s linear infinite' }} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 
@@ -51,15 +53,51 @@ function App() {
     return <Login onLogin={setUser} onGoToRegister={() => setPage('register')} />;
   }
 
+  // ── Admin dashboard ──────────────────────────────────────────────────────
+  if (view === 'admin') {
+    return (
+      <AdminDashboard
+        user={user}
+        onBack={() => setView('daily')}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  // ── Project board ────────────────────────────────────────────────────────
   if (view === 'board' && activeProject) {
-    return <ProjectBoard project={activeProject} user={user} onBack={() => setView('projects')} onLogout={handleLogout} />;
+    return (
+      <ProjectBoard
+        project={activeProject}
+        user={user}
+        onBack={() => setView('projects')}
+        onLogout={handleLogout}
+      />
+    );
   }
 
+  // ── Projects list ────────────────────────────────────────────────────────
   if (view === 'projects') {
-    return <ProjectList user={user} onOpenProject={openProject} onGoToDaily={() => setView('daily')} onLogout={handleLogout} />;
+    return (
+      <ProjectList
+        user={user}
+        onOpenProject={openProject}
+        onGoToDaily={() => setView('daily')}
+        onGoToAdmin={user.is_admin ? () => setView('admin') : null}
+        onLogout={handleLogout}
+      />
+    );
   }
 
-  return <KanbanBoard user={user} onLogout={handleLogout} onGoToProjects={() => setView('projects')} />;
+  // ── Daily kanban (default) ───────────────────────────────────────────────
+  return (
+    <KanbanBoard
+      user={user}
+      onLogout={handleLogout}
+      onGoToProjects={() => setView('projects')}
+      onGoToAdmin={user.is_admin ? () => setView('admin') : null}
+    />
+  );
 }
 
 const el = document.getElementById('app');

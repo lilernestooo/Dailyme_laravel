@@ -15,6 +15,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
     ];
 
     protected $hidden = [
@@ -27,6 +28,24 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
+            'is_admin'          => 'boolean',
         ];
+    }
+
+    // ── Relationships ──────────────────────────────────────────────────────
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function ownedProjects()
+    {
+        return $this->hasMany(Project::class, 'owner_id');
+    }
+
+    public function projectMembers()
+    {
+        return $this->hasMany(ProjectMember::class);
     }
 }

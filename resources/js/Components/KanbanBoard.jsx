@@ -441,7 +441,7 @@ function ProfileDropdown({ user, onLogout }) {
 }
 
 // ── Main Board ─────────────────────────────────────────────────────────────
-export default function KanbanBoard({ user, onLogout, onGoToProjects }) {
+export default function KanbanBoard({ user, onLogout, onGoToProjects, onGoToAdmin }) {
   const [columns, setColumns]         = useState({ todo: [], in_progress: [], done: [] });
   const [modal, setModal]             = useState(null);
   const [loading, setLoading]         = useState(true);
@@ -564,6 +564,13 @@ export default function KanbanBoard({ user, onLogout, onGoToProjects }) {
         <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
           <NavIcon icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} label="Projects" onClick={() => onGoToProjects && onGoToProjects()} />
           <NavIcon icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>} label="History" onClick={() => setShowHistory((v) => !v)} active={showHistory} badge={history.length} />
+          {onGoToAdmin && (
+            <NavIcon
+              icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>}
+              label="Admin Dashboard"
+              onClick={onGoToAdmin}
+            />
+          )}
           <Tooltip label="Notifications">
             <NotificationBell onOpenProject={onGoToProjects} />
           </Tooltip>

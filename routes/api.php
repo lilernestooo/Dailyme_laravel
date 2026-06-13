@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketCommentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AdminController;
 
 // Public auth routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -53,5 +54,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Comments
         Route::post('/{project}/tickets/{ticket}/comments', [TicketCommentController::class, 'store']);
+    });
+
+    // ── Admin routes ───────────────────────────────────────────────────────
+    Route::prefix('admin')->group(function () {
+        Route::get('/stats',                          [AdminController::class, 'stats']);
+        Route::get('/users',                          [AdminController::class, 'users']);
+        Route::patch('/users/{user}/toggle-admin',    [AdminController::class, 'toggleAdmin']);
+        Route::delete('/users/{user}',                [AdminController::class, 'deleteUser']);
     });
 });
