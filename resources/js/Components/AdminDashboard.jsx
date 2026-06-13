@@ -502,8 +502,8 @@ export default function AdminDashboard({ user, onBack, onLogout }) {
 
         {/* Page title */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: P.textPrimary, letterSpacing: '-.03em' }}>Overview</h1>
-          <p style={{ margin: '4px 0 0', fontSize: 13, color: P.textMuted }}>System-wide stats and user management</p>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: P.textPrimary, letterSpacing: '-.03em' }}>AdminDashboard</h1>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: P.textMuted }}>User management</p>
         </div>
 
         {/* ── Stat Cards ──────────────────────────────────────── */}
