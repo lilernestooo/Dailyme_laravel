@@ -189,7 +189,7 @@ function ConfirmModal({ message, onConfirm, onCancel }) {
 }
 
 // ── Users Table ────────────────────────────────────────────────────────────
-function UsersTable({ users, currentUserId, onToggleAdmin, onDeleteUser }) {
+function UsersTable({ users, currentUserId, onToggleAdmin, onDeleteUser, deletingId }) {
   const [search, setSearch] = useState('');
   const [confirm, setConfirm] = useState(null); // { type: 'admin'|'delete', user }
 
@@ -321,15 +321,19 @@ function UsersTable({ users, currentUserId, onToggleAdmin, onDeleteUser }) {
                             </button>
                           </Tooltip>
                           <Tooltip label="Delete User">
-                            <button
-                              onClick={() => !isCurrentUser && setConfirm({ type: 'delete', user: u })}
-                              disabled={isCurrentUser}
-                              style={{ padding: '5px 9px', borderRadius: 8, border: '1px solid #fca5a5', background: '#fee2e2', color: '#dc2626', cursor: isCurrentUser ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', opacity: isCurrentUser ? .4 : 1, transition: 'all .15s' }}
-                              onMouseEnter={(e) => { if (!isCurrentUser) e.currentTarget.style.background = '#fecaca'; }}
-                              onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}>
-                              <Icons.Trash />
-                            </button>
-                          </Tooltip>
+                              <button
+                                onClick={() => !isCurrentUser && !deletingId && setConfirm({ type: 'delete', user: u })}
+                                disabled={isCurrentUser || deletingId === u.id}
+                                style={{ padding: '5px 9px', borderRadius: 8, border: '1px solid #fca5a5', background: '#fee2e2', color: '#dc2626', cursor: (isCurrentUser || deletingId === u.id) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', opacity: (isCurrentUser || deletingId === u.id) ? .6 : 1, transition: 'all .15s', minWidth: 28, justifyContent: 'center' }}
+                                onMouseEnter={(e) => { if (!isCurrentUser && !deletingId) e.currentTarget.style.background = '#fecaca'; }}
+                                onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}>
+                                {deletingId === u.id ? (
+                                  <div style={{ width: 13, height: 13, border: '2px solid #fca5a5', borderTopColor: '#dc2626', borderRadius: '50%', animation: 'spin .6s linear infinite' }} />
+                                ) : (
+                                  <Icons.Trash />
+                                )}
+                              </button>
+                            </Tooltip>
                         </div>
                       </td>
                     </tr>
@@ -365,6 +369,8 @@ export default function AdminDashboard({ user, onBack, onLogout }) {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
 
   async function loadData() {
     try {
@@ -395,12 +401,15 @@ export default function AdminDashboard({ user, onBack, onLogout }) {
   }
 
   async function handleDeleteUser(targetUser) {
+    setDeletingId(targetUser.id);
     try {
       await apiFetch(`/api/admin/users/${targetUser.id}`, { method: 'DELETE' });
       setUsers(prev => prev.filter(u => u.id !== targetUser.id));
       setStats(prev => prev ? { ...prev, total_users: prev.total_users - 1 } : prev);
     } catch {
       alert('Failed to delete user.');
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -530,6 +539,7 @@ export default function AdminDashboard({ user, onBack, onLogout }) {
           currentUserId={user.id}
           onToggleAdmin={handleToggleAdmin}
           onDeleteUser={handleDeleteUser}
+          deletingId={deletingId} 
         />
       </div>
 
