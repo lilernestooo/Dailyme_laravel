@@ -10,40 +10,41 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Fixed named accounts — safe to re-run (firstOrCreate)
+        $defaultPassword = env('SEEDER_DEFAULT_PASSWORD', 'password');
+
         $fixed = [
             [
-                'name'              => 'Admin User',
-                'email'             => 'admin@example.com',
-                'password'          => Hash::make('password'),
+                'name'              => env('ADMIN_NAME', 'Admin User'),
+                'email'             => env('ADMIN_EMAIL', 'admin@example.com'),
+                'password'          => Hash::make(env('ADMIN_PASSWORD', $defaultPassword)),
                 'email_verified_at' => now(),
-                'is_admin'          => true,   // ← only admin account
+                'is_admin'          => true,
             ],
             [
-                'name'              => 'QA Engineer',
-                'email'             => 'qa@example.com',
-                'password'          => Hash::make('password'),
-                'email_verified_at' => now(),
-                'is_admin'          => false,
-            ],
-            [
-                'name'              => 'Developer One',
-                'email'             => 'dev1@example.com',
-                'password'          => Hash::make('password'),
+                'name'              => env('QA_NAME', 'QA Engineer'),
+                'email'             => env('QA_EMAIL', 'qa@example.com'),
+                'password'          => Hash::make(env('QA_PASSWORD', $defaultPassword)),
                 'email_verified_at' => now(),
                 'is_admin'          => false,
             ],
             [
-                'name'              => 'Developer Two',
-                'email'             => 'dev2@example.com',
-                'password'          => Hash::make('password'),
+                'name'              => env('DEV1_NAME', 'Developer One'),
+                'email'             => env('DEV1_EMAIL', 'dev1@example.com'),
+                'password'          => Hash::make(env('DEV1_PASSWORD', $defaultPassword)),
                 'email_verified_at' => now(),
                 'is_admin'          => false,
             ],
             [
-                'name'              => 'Project Manager',
-                'email'             => 'pm@example.com',
-                'password'          => Hash::make('password'),
+                'name'              => env('DEV2_NAME', 'Developer Two'),
+                'email'             => env('DEV2_EMAIL', 'dev2@example.com'),
+                'password'          => Hash::make(env('DEV2_PASSWORD', $defaultPassword)),
+                'email_verified_at' => now(),
+                'is_admin'          => false,
+            ],
+            [
+                'name'              => env('PM_NAME', 'Project Manager'),
+                'email'             => env('PM_EMAIL', 'pm@example.com'),
+                'password'          => Hash::make(env('PM_PASSWORD', $defaultPassword)),
                 'email_verified_at' => now(),
                 'is_admin'          => false,
             ],
@@ -53,7 +54,9 @@ class UserSeeder extends Seeder
             User::firstOrCreate(['email' => $data['email']], $data);
         }
 
-        // 10 additional fake users
-        User::factory(10)->create();
+        // Extra fake users (local/dev only)
+        if (app()->environment('local')) {
+            User::factory(10)->create();
+        }
     }
 }
