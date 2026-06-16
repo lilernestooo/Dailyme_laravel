@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { ProjectListPageSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 
 // ── Laravel Flame Logo ─────────────────────────────────────────────────────
@@ -275,6 +276,8 @@ export default function ProjectList({ user, onOpenProject, onGoToDaily, onLogout
     onLogout();
   }
 
+  if (loading) return <ProjectListPageSkeleton count={6} />;
+
   return (
     <div style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", minHeight: '100vh', background: P.bg }}>
 
@@ -339,14 +342,7 @@ export default function ProjectList({ user, onOpenProject, onGoToDaily, onLogout
           </div>
         )}
 
-        {loading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '40vh', color: P.purple500, gap: 10 }}>
-            <div style={{ width: 18, height: 18, border: `2px solid ${P.purple100}`, borderTopColor: P.purple600, borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
-            Loading projects…
-            <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-          </div>
-
-        ) : projects.length === 0 ? (
+        {projects.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, color: P.purple300 }}>
               <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>

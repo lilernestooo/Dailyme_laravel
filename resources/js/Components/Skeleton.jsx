@@ -392,6 +392,84 @@ export function TaskHistorySkeleton({ rows = 6 }) {
   );
 }
 
+// ── ProjectList page ───────────────────────────────────────────────────────
+export function ProjectListPageSkeleton({ count = 6 }) {
+    return (
+      <div style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", minHeight: '100vh', background: P.bg }}>
+  
+        {/* Navbar skeleton */}
+        <header style={{
+          background: P.white, borderBottom: `1px solid ${P.border}`,
+          padding: '0 24px', height: 56,
+          display: 'flex', alignItems: 'center', gap: 10,
+          position: 'sticky', top: 0, zIndex: 1000,
+          boxShadow: '0 1px 8px rgba(124,58,237,.06)',
+        }}>
+          <SkeletonBox width={32} height={32} radius={10} />
+          <SkeletonBox width={80} height={16} radius={6} />
+  
+          <div style={{ width: 1, height: 22, background: P.border, margin: '0 6px' }} />
+  
+          {/* Nav icons */}
+          <SkeletonBox width={36} height={36} radius={10} />
+          <SkeletonBox width={36} height={36} radius={10} />
+  
+          <div style={{ flex: 1 }} />
+  
+          {/* Project count chip + button + avatar */}
+          <SkeletonPill width={80} height={28} />
+          <SkeletonBox width={120} height={34} radius={9} />
+          <div style={{ width: 1, height: 22, background: P.border, margin: '0 4px' }} />
+          <SkeletonCircle size={34} />
+        </header>
+  
+        {/* Cards grid */}
+        <div style={{
+          padding: '32px 28px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: 20,
+        }}>
+          {Array.from({ length: count }).map((_, i) => (
+            <div key={i} style={{
+              background: P.white, borderRadius: 16, padding: 22,
+              border: `1px solid ${P.border}`,
+              boxShadow: '0 1px 6px rgba(124,58,237,.05)',
+              display: 'flex', flexDirection: 'column', gap: 0,
+            }}>
+              {/* Card header — icon + badge */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
+                <SkeletonBox width={40} height={40} radius={11} />
+                <SkeletonPill width={58} height={24} />
+              </div>
+  
+              {/* Title */}
+              <SkeletonText width={`${50 + (i % 3) * 15}%`} height={15} style={{ marginBottom: 8 }} />
+  
+              {/* Description lines */}
+              <SkeletonText width="90%" height={12} style={{ marginBottom: 5 }} />
+              <SkeletonText width="70%" height={12} style={{ marginBottom: 16 }} />
+  
+              {/* Member avatars */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                {[0, 1, 2].map((j) => (
+                  <SkeletonCircle key={j} size={26} style={{ marginLeft: j > 0 ? -8 : 0, border: '2px solid #fff' }} />
+                ))}
+                <SkeletonText width={60} height={11} style={{ marginLeft: 4 }} />
+              </div>
+  
+              {/* Action buttons */}
+              <div style={{ display: 'flex', gap: 8 }}>
+                <SkeletonBox width="100%" height={34} radius={9} />
+                <SkeletonBox width={38} height={34} radius={9} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
 // ══════════════════════════════════════════════════════════════════════════
 // Usage helper — drop-in guard for any component
 // ══════════════════════════════════════════════════════════════════════════
@@ -413,6 +491,7 @@ export default {
   Card:           SkeletonCard,
   KanbanBoard:    KanbanBoardSkeleton,
   ProjectList:    ProjectListSkeleton,
+  ProjectListPage: ProjectListPageSkeleton,   // ← new
   AdminDashboard: AdminDashboardSkeleton,
   TicketDetail:   TicketDetailSkeleton,
   TaskHistory:    TaskHistorySkeleton,
