@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { KanbanBoardSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 import TicketDetail from './TicketDetail';
 
@@ -1136,13 +1137,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
     }
   }
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', color: P.purple500, fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", gap: 10 }}>
-      <div style={{ width: 18, height: 18, border: `2px solid ${P.purple100}`, borderTopColor: P.purple600, borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
-      Loading board…
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </div>
-  );
+  if (loading) return <KanbanBoardSkeleton />;
 
   return (
     <div style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", minHeight: '100vh', background: P.bg }}>
