@@ -469,6 +469,100 @@ export function ProjectListPageSkeleton({ count = 6 }) {
       </div>
     );
   }
+  // ── AdminDashboard full page ───────────────────────────────────────────────
+export function AdminDashboardPageSkeleton() {
+  return (
+    <div style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", minHeight: '100vh', background: P.bg }}>
+
+      {/* Navbar */}
+      <header style={{
+        background: P.white, borderBottom: `1px solid ${P.border}`,
+        padding: '0 24px', height: 56,
+        display: 'flex', alignItems: 'center', gap: 10,
+        position: 'sticky', top: 0, zIndex: 1000,
+        boxShadow: '0 1px 8px rgba(124,58,237,.06)',
+      }}>
+        <SkeletonBox width={32} height={32} radius={10} />
+        <SkeletonBox width={80} height={16} radius={6} />
+        <div style={{ width: 1, height: 22, background: P.border, margin: '0 6px' }} />
+        <SkeletonPill width={140} height={28} />
+        <div style={{ flex: 1 }} />
+        <SkeletonBox width={36} height={36} radius={10} />
+        <SkeletonBox width={110} height={34} radius={9} />
+        <div style={{ width: 1, height: 22, background: P.border, margin: '0 4px' }} />
+        <SkeletonCircle size={34} />
+      </header>
+
+      <div style={{ padding: '28px 28px 60px', maxWidth: 1400, margin: '0 auto' }}>
+        {/* Page title */}
+        <SkeletonText width={180} height={22} style={{ marginBottom: 6 }} />
+        <SkeletonText width={120} height={13} style={{ marginBottom: 28 }} />
+
+        {/* Stat cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} style={{ background: P.white, borderRadius: 16, padding: '20px 22px', border: `1px solid ${P.border}`, display: 'flex', alignItems: 'center', gap: 16 }}>
+              <SkeletonBox width={48} height={48} radius={14} />
+              <div style={{ flex: 1 }}>
+                <SkeletonText width={60} height={26} style={{ marginBottom: 8 }} />
+                <SkeletonText width={90} height={12} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16, marginBottom: 28 }}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} style={{ background: P.white, borderRadius: 16, padding: '20px 22px', border: `1px solid ${P.border}` }}>
+              <SkeletonText width={140} height={14} style={{ marginBottom: 16 }} />
+              {[1, 2, 3].map((j) => (
+                <div key={j} style={{ marginBottom: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <SkeletonText width={80} height={11} />
+                    <SkeletonText width={24} height={11} />
+                  </div>
+                  <SkeletonBox width="100%" height={6} radius={99} />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Table */}
+        <div style={{ background: P.white, borderRadius: 16, border: `1px solid ${P.border}`, overflow: 'hidden' }}>
+          <div style={{ padding: '18px 22px', borderBottom: `1px solid ${P.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <SkeletonBox width={36} height={36} radius={10} />
+            <div>
+              <SkeletonText width={80} height={15} style={{ marginBottom: 5 }} />
+              <SkeletonText width={110} height={11} />
+            </div>
+            <div style={{ flex: 1 }} />
+            <SkeletonBox width={200} height={34} radius={9} />
+          </div>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+            <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr', gap: 16, padding: '14px 22px', borderBottom: `1px solid ${P.border}`, alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <SkeletonCircle size={32} />
+                <SkeletonText width={90} height={13} />
+              </div>
+              <SkeletonText width={130} height={12} />
+              <SkeletonPill width={56} height={22} />
+              <SkeletonText width={24} height={13} style={{ margin: '0 auto' }} />
+              <SkeletonText width={24} height={13} style={{ margin: '0 auto' }} />
+              <SkeletonText width={24} height={13} style={{ margin: '0 auto' }} />
+              <SkeletonText width={70} height={11} />
+              <div style={{ display: 'flex', gap: 6 }}>
+                <SkeletonBox width={60} height={28} radius={8} />
+                <SkeletonBox width={28} height={28} radius={8} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ══════════════════════════════════════════════════════════════════════════
 // Usage helper — drop-in guard for any component
@@ -493,6 +587,7 @@ export default {
   ProjectList:    ProjectListSkeleton,
   ProjectListPage: ProjectListPageSkeleton,   // ← new
   AdminDashboard: AdminDashboardSkeleton,
+  AdminDashboardPage: AdminDashboardPageSkeleton,  // ← new
   TicketDetail:   TicketDetailSkeleton,
   TaskHistory:    TaskHistorySkeleton,
   Guard:          SkeletonGuard,
