@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { AdminDashboardPageSkeleton } from './Skeleton';
+import { Table, Pagination } from 'antd';
+import 'antd/dist/reset.css';
 
 // ── Palette ────────────────────────────────────────────────────────────────
 const P = {
@@ -191,7 +194,9 @@ function ConfirmModal({ message, onConfirm, onCancel }) {
 // ── Users Table ────────────────────────────────────────────────────────────
 function UsersTable({ users, currentUserId, onToggleAdmin, onDeleteUser, deletingId }) {
   const [search, setSearch] = useState('');
-  const [confirm, setConfirm] = useState(null); // { type: 'admin'|'delete', user }
+  const [confirm, setConfirm] = useState(null);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const filtered = users.filter(u =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -210,10 +215,111 @@ function UsersTable({ users, currentUserId, onToggleAdmin, onDeleteUser, deletin
     return new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  const columns = [
+    {
+      title: 'User',
+      key: 'user',
+      render: (_, u) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 32, height: 32, borderRadius: '50%', background: u.is_admin ? P.purple600 : P.purple400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+            {u.name?.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: P.textPrimary }}>{u.name}</div>
+            {u.id === currentUserId && <div style={{ fontSize: 10, color: P.purple600, fontWeight: 600 }}>You</div>}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      render: (v) => <span style={{ fontSize: 13, color: P.textSecondary }}>{v}</span>,
+    },
+    {
+      title: 'Role',
+      key: 'role',
+      render: (_, u) => u.is_admin ? (
+        <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: P.purple100, color: P.purple600, border: `1px solid ${P.purple200}`, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Icons.Shield /> Admin
+        </span>
+      ) : (
+        <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: '#f3f4f6', color: '#374151', border: '1px solid #e5e7eb' }}>
+          User
+        </span>
+      ),
+    },
+    {
+      title: 'Tasks',
+      dataIndex: 'tasks_count',
+      key: 'tasks',
+      align: 'center',
+      render: (v) => <span style={{ fontSize: 13, fontWeight: 600, color: P.textPrimary }}>{v ?? 0}</span>,
+    },
+    {
+      title: 'Projects Owned',
+      dataIndex: 'projects_owned',
+      key: 'projects_owned',
+      align: 'center',
+      render: (v) => <span style={{ fontSize: 13, fontWeight: 600, color: P.textPrimary }}>{v ?? 0}</span>,
+    },
+    {
+      title: 'Member Of',
+      dataIndex: 'projects_member',
+      key: 'projects_member',
+      align: 'center',
+      render: (v) => <span style={{ fontSize: 13, fontWeight: 600, color: P.textPrimary }}>{v ?? 0}</span>,
+    },
+    {
+      title: 'Joined',
+      dataIndex: 'created_at',
+      key: 'joined',
+      render: (v) => <span style={{ fontSize: 12, color: P.textMuted }}>{formatDate(v)}</span>,
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, u) => {
+        const isCurrentUser = u.id === currentUserId;
+        return (
+          <div style={{ display: 'flex', gap: 6 }}>
+            <Tooltip label={u.is_admin ? 'Revoke Admin' : 'Make Admin'}>
+              <button
+                onClick={() => !isCurrentUser && setConfirm({ type: 'admin', user: u })}
+                disabled={isCurrentUser}
+                style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid ${u.is_admin ? P.purple300 : P.border}`, background: u.is_admin ? P.purple100 : P.white, color: u.is_admin ? P.purple600 : P.textSecondary, cursor: isCurrentUser ? 'not-allowed' : 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, opacity: isCurrentUser ? .4 : 1, transition: 'all .15s' }}
+                onMouseEnter={(e) => { if (!isCurrentUser) { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple400; }}}
+                onMouseLeave={(e) => { e.currentTarget.style.background = u.is_admin ? P.purple100 : P.white; e.currentTarget.style.borderColor = u.is_admin ? P.purple300 : P.border; }}>
+                <Icons.Crown /> {u.is_admin ? 'Revoke' : 'Admin'}
+              </button>
+            </Tooltip>
+            <Tooltip label="Delete User">
+              <button
+                onClick={() => !isCurrentUser && !deletingId && setConfirm({ type: 'delete', user: u })}
+                disabled={isCurrentUser || deletingId === u.id}
+                style={{ padding: '5px 9px', borderRadius: 8, border: '1px solid #fca5a5', background: '#fee2e2', color: '#dc2626', cursor: (isCurrentUser || deletingId === u.id) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', opacity: (isCurrentUser || deletingId === u.id) ? .6 : 1, transition: 'all .15s', minWidth: 28, justifyContent: 'center' }}
+                onMouseEnter={(e) => { if (!isCurrentUser && !deletingId) e.currentTarget.style.background = '#fecaca'; }}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}>
+                {deletingId === u.id ? (
+                  <div style={{ width: 13, height: 13, border: '2px solid #fca5a5', borderTopColor: '#dc2626', borderRadius: '50%', animation: 'spin .6s linear infinite' }} />
+                ) : (
+                  <Icons.Trash />
+                )}
+              </button>
+            </Tooltip>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <>
       <div style={{ background: P.white, borderRadius: 16, border: `1px solid ${P.border}`, boxShadow: '0 1px 6px rgba(124,58,237,.05)', overflow: 'hidden' }}>
-        {/* Table header */}
+        {/* Header */}
         <div style={{ padding: '18px 22px', borderBottom: `1px solid ${P.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P.purple600 }}>
             <Icons.Users />
@@ -223,13 +329,13 @@ function UsersTable({ users, currentUserId, onToggleAdmin, onDeleteUser, deletin
             <div style={{ fontSize: 12, color: P.textMuted }}>{users.length} registered user{users.length !== 1 ? 's' : ''}</div>
           </div>
           <div style={{ flex: 1 }} />
-          {/* Search */}
           <div style={{ position: 'relative' }}>
             <div style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: P.textMuted, display: 'flex' }}>
               <Icons.Search />
             </div>
             <input
-              value={search} onChange={(e) => setSearch(e.target.value)}
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search users…"
               style={{ padding: '8px 12px 8px 34px', borderRadius: 9, border: `1.5px solid ${P.border}`, fontSize: 13, outline: 'none', background: P.purple50, color: P.textPrimary, width: 200, transition: 'border-color .15s' }}
               onFocus={(e) => e.target.style.borderColor = P.purple400}
@@ -238,110 +344,29 @@ function UsersTable({ users, currentUserId, onToggleAdmin, onDeleteUser, deletin
           </div>
         </div>
 
-        {/* Table */}
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: P.purple50 }}>
-                {['User', 'Email', 'Role', 'Tasks', 'Projects Owned', 'Member Of', 'Joined', 'Actions'].map(h => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: P.textSecondary, textTransform: 'uppercase', letterSpacing: '.06em', whiteSpace: 'nowrap', borderBottom: `1px solid ${P.border}` }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={8} style={{ padding: '40px 0', textAlign: 'center', color: P.textMuted, fontSize: 13 }}>
-                    No users found
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((u, i) => {
-                  const isCurrentUser = u.id === currentUserId;
-                  return (
-                    <tr key={u.id}
-                      style={{ borderBottom: `1px solid ${P.border}`, background: i % 2 === 0 ? P.white : '#fdfcff', transition: 'background .1s' }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = P.purple50}
-                      onMouseLeave={(e) => e.currentTarget.style.background = i % 2 === 0 ? P.white : '#fdfcff'}>
+        {/* Ant Design Table */}
+        <Table
+          dataSource={paginated}
+          columns={columns}
+          rowKey="id"
+          pagination={false}
+          size="middle"
+          style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif" }}
+        />
 
-                      {/* User */}
-                      <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div style={{ width: 32, height: 32, borderRadius: '50%', background: u.is_admin ? P.purple600 : P.purple400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
-                            {u.name?.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: P.textPrimary }}>{u.name}</div>
-                            {isCurrentUser && <div style={{ fontSize: 10, color: P.purple600, fontWeight: 600 }}>You</div>}
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Email */}
-                      <td style={{ padding: '12px 16px', fontSize: 13, color: P.textSecondary, whiteSpace: 'nowrap' }}>{u.email}</td>
-
-                      {/* Role */}
-                      <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
-                        {u.is_admin ? (
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: P.purple100, color: P.purple600, border: `1px solid ${P.purple200}`, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                            <Icons.Shield /> Admin
-                          </span>
-                        ) : (
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: '#f3f4f6', color: '#374151', border: '1px solid #e5e7eb' }}>
-                            User
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Tasks */}
-                      <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600, color: P.textPrimary, textAlign: 'center' }}>{u.tasks_count ?? 0}</td>
-
-                      {/* Projects owned */}
-                      <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600, color: P.textPrimary, textAlign: 'center' }}>{u.projects_owned ?? 0}</td>
-
-                      {/* Member of */}
-                      <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600, color: P.textPrimary, textAlign: 'center' }}>{u.projects_member ?? 0}</td>
-
-                      {/* Joined */}
-                      <td style={{ padding: '12px 16px', fontSize: 12, color: P.textMuted, whiteSpace: 'nowrap' }}>{formatDate(u.created_at)}</td>
-
-                      {/* Actions */}
-                      <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <Tooltip label={u.is_admin ? 'Revoke Admin' : 'Make Admin'}>
-                            <button
-                              onClick={() => !isCurrentUser && setConfirm({ type: 'admin', user: u })}
-                              disabled={isCurrentUser}
-                              style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid ${u.is_admin ? P.purple300 : P.border}`, background: u.is_admin ? P.purple100 : P.white, color: u.is_admin ? P.purple600 : P.textSecondary, cursor: isCurrentUser ? 'not-allowed' : 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, opacity: isCurrentUser ? .4 : 1, transition: 'all .15s' }}
-                              onMouseEnter={(e) => { if (!isCurrentUser) { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple400; } }}
-                              onMouseLeave={(e) => { e.currentTarget.style.background = u.is_admin ? P.purple100 : P.white; e.currentTarget.style.borderColor = u.is_admin ? P.purple300 : P.border; }}>
-                              <Icons.Crown /> {u.is_admin ? 'Revoke' : 'Admin'}
-                            </button>
-                          </Tooltip>
-                          <Tooltip label="Delete User">
-                              <button
-                                onClick={() => !isCurrentUser && !deletingId && setConfirm({ type: 'delete', user: u })}
-                                disabled={isCurrentUser || deletingId === u.id}
-                                style={{ padding: '5px 9px', borderRadius: 8, border: '1px solid #fca5a5', background: '#fee2e2', color: '#dc2626', cursor: (isCurrentUser || deletingId === u.id) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', opacity: (isCurrentUser || deletingId === u.id) ? .6 : 1, transition: 'all .15s', minWidth: 28, justifyContent: 'center' }}
-                                onMouseEnter={(e) => { if (!isCurrentUser && !deletingId) e.currentTarget.style.background = '#fecaca'; }}
-                                onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}>
-                                {deletingId === u.id ? (
-                                  <div style={{ width: 13, height: 13, border: '2px solid #fca5a5', borderTopColor: '#dc2626', borderRadius: '50%', animation: 'spin .6s linear infinite' }} />
-                                ) : (
-                                  <Icons.Trash />
-                                )}
-                              </button>
-                            </Tooltip>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+        {/* Pagination row */}
+        <div style={{ padding: '14px 22px', borderTop: `1px solid ${P.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 12, color: P.textMuted }}>
+            Showing {filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} users
+          </span>
+          <Pagination
+            current={page}
+            pageSize={PAGE_SIZE}
+            total={filtered.length}
+            onChange={(p) => setPage(p)}
+            showSizeChanger={false}
+            style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif" }}
+          />
         </div>
       </div>
 
@@ -361,7 +386,6 @@ function UsersTable({ users, currentUserId, onToggleAdmin, onDeleteUser, deletin
     </>
   );
 }
-
 // ── Main AdminDashboard ────────────────────────────────────────────────────
 export default function AdminDashboard({ user, onBack, onLogout }) {
   const [stats, setStats]     = useState(null);
@@ -448,13 +472,7 @@ export default function AdminDashboard({ user, onBack, onLogout }) {
     qa:     { bar: '#f59e0b',   label: 'QA' },
   };
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: P.purple500, fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", gap: 10 }}>
-      <div style={{ width: 18, height: 18, border: `2px solid ${P.purple100}`, borderTopColor: P.purple600, borderRadius: '50%', animation: 'spin .6s linear infinite' }} />
-      Loading admin dashboard…
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </div>
-  );
+  if (loading) return <AdminDashboardPageSkeleton />;
 
   return (
     <div style={{ fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", minHeight: '100vh', background: P.bg }}>
