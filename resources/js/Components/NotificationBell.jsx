@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { BellOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const P = {
   purple50:  '#f5f3ff',
@@ -134,10 +135,7 @@ export default function NotificationBell({ onOpenProject }) {
         onMouseEnter={(e) => { if (!open) { e.currentTarget.style.background = P.purple50; e.currentTarget.style.color = P.purple500; }}}
         onMouseLeave={(e) => { if (!open) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = P.textMuted; }}}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-        </svg>
+      <BellOutlined style={{ fontSize: 16 }} />
         {unreadCount > 0 && (
           <span style={{
             position: 'absolute', top: 4, right: 4,
@@ -192,10 +190,7 @@ export default function NotificationBell({ onOpenProject }) {
             ) : notifications.length === 0 ? (
               <div style={{ padding: 40, textAlign: 'center', color: P.textMuted }}>
                 <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center', color: P.textMuted }}>
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                  </svg>
+                <BellOutlined style={{ fontSize: 32, color: P.textMuted }} />
                 </div>
                 <p style={{ margin: 0, fontSize: 13 }}>No notifications yet</p>
               </div>
@@ -247,11 +242,7 @@ export default function NotificationBell({ onOpenProject }) {
                         onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.color = '#dc2626'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.opacity = '0'; e.currentTarget.style.color = P.textMuted; }}
                       >
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3 6 5 6 21 6"/>
-                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                          <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                        </svg>
+                    <DeleteOutlined style={{ fontSize: 13 }} />
                       </button>
                     </div>
                   </div>
