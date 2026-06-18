@@ -5,6 +5,7 @@ import {
   AppstoreOutlined,
   DeleteOutlined,
   LogoutOutlined,
+  FolderOpenOutlined,
 } from '@ant-design/icons';
 import { ProjectListPageSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
