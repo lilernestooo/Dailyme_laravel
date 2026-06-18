@@ -1,4 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {
+  CalendarOutlined,
+  PlusOutlined,
+  AppstoreOutlined,
+  DeleteOutlined,
+  LogoutOutlined,
+} from '@ant-design/icons';
 import { ProjectListPageSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 
@@ -143,7 +150,7 @@ function ProfileDropdown({ user, onLogout }) {
               onMouseEnter={(e) => e.currentTarget.style.background = "#fff5f5"}
               onMouseLeave={(e) => e.currentTarget.style.background = "none"}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <LogoutOutlined style={{ fontSize: 15 }} />
               Sign out
             </button>
           </div>
@@ -304,7 +311,7 @@ export default function ProjectList({ user, onOpenProject, onGoToDaily, onLogout
           <NavIcon
             label="Daily Tasks"
             onClick={onGoToDaily}
-            icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>}
+            icon={<CalendarOutlined style={{ fontSize: 16 }} />}
           />
           <Tooltip label="Notifications">
             <NotificationBell onOpenProject={onOpenProject} />
@@ -325,7 +332,7 @@ export default function ProjectList({ user, onOpenProject, onGoToDaily, onLogout
           onMouseEnter={(e) => { e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = 'translateY(-1px)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = P.purple600; e.currentTarget.style.transform = 'translateY(0)'; }}
         >
-          <span style={{ fontSize: 16, fontWeight: 400 }}>+</span> New Project
+          <PlusOutlined /> New Project
         </button>
 
         <div style={{ width: 1, height: 22, background: P.border, margin: '0 4px' }} />
@@ -345,7 +352,7 @@ export default function ProjectList({ user, onOpenProject, onGoToDaily, onLogout
         {projects.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, color: P.purple300 }}>
-              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <FolderOpenOutlined style={{ fontSize: 52, color: P.purple300 }} />            
             </div>
             <h3 style={{ margin: '0 0 8px', color: P.textPrimary, fontSize: 18, fontWeight: 700 }}>No projects yet</h3>
             <p style={{ margin: '0 0 24px', color: P.textSecondary, fontSize: 14 }}>Create your first project to get started</p>
@@ -452,7 +459,7 @@ function ProjectCard({ project, onOpen, onDelete }) {
           onMouseEnter={(e) => e.currentTarget.style.background = P.purple700}
           onMouseLeave={(e) => e.currentTarget.style.background = P.purple600}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <AppstoreOutlined style={{ fontSize: 13 }} />
           Open Board
         </button>
         {isOwner && (
@@ -462,7 +469,7 @@ function ProjectCard({ project, onOpen, onDelete }) {
             onMouseEnter={(e) => { e.currentTarget.style.background = '#fecaca'; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = '#fee2e2'; }}
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            <DeleteOutlined style={{ fontSize: 13 }} />
           </button>
         )}
       </div>

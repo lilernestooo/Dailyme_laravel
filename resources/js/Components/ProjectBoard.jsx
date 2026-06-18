@@ -1,4 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {
+  ArrowLeftOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+  PlusOutlined,
+  MessageOutlined,
+  AuditOutlined,
+  InboxOutlined,
+  ArrowRightOutlined,
+  LogoutOutlined,
+  MailOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  RollbackOutlined,
+  CrownOutlined,
+  TagOutlined,
+  CheckCircleOutlined,
+  DownOutlined,
+} from '@ant-design/icons';
 import { KanbanBoardSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 import TicketDetail from './TicketDetail';
@@ -34,117 +55,24 @@ function LaravelLogo({ size = 28 }) {
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────
 const Icons = {
-  ArrowLeft: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 12H5M12 5l-7 7 7 7"/>
-    </svg>
-  ),
-  Edit: () => (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-    </svg>
-  ),
-  Trash: () => (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 6 5 6 21 6"/>
-      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-      <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-    </svg>
-  ),
-  Users: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-      <circle cx="9" cy="7" r="4"/>
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-    </svg>
-  ),
-  UserPlus: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-      <circle cx="8.5" cy="7" r="4"/>
-      <line x1="20" y1="8" x2="20" y2="14"/>
-      <line x1="23" y1="11" x2="17" y2="11"/>
-    </svg>
-  ),
-  Plus: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19"/>
-      <line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
-  ),
-  MessageSquare: () => (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    </svg>
-  ),
-  ClipboardCheck: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-      <rect x="9" y="3" width="6" height="4" rx="1" ry="1"/>
-      <path d="M9 12l2 2 4-4"/>
-    </svg>
-  ),
-  Archive: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="21 8 21 21 3 21 3 8"/>
-      <rect x="1" y="3" width="22" height="5"/>
-      <line x1="10" y1="12" x2="14" y2="12"/>
-    </svg>
-  ),
-  ArrowRight: () => (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="5" y1="12" x2="19" y2="12"/>
-      <polyline points="12 5 19 12 12 19"/>
-    </svg>
-  ),
-  LogOut: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-      <polyline points="16 17 21 12 16 7"/>
-      <line x1="21" y1="12" x2="9" y2="12"/>
-    </svg>
-  ),
-  Mail: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-      <polyline points="22,6 12,13 2,6"/>
-    </svg>
-  ),
-  Check: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12"/>
-    </svg>
-  ),
-  X: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="18" y1="6" x2="6" y2="18"/>
-      <line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
-  ),
-  Reply: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="9 17 4 12 9 7"/>
-      <path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
-    </svg>
-  ),
-  Crown: () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/>
-      <path d="M5 20h14"/>
-    </svg>
-  ),
-  Ticket: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
-    </svg>
-  ),
-  Inbox: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 12h-6l-2 3h-4l-2-3H2"/>
-      <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
-    </svg>
-  ),
+  ArrowLeft:      () => <ArrowLeftOutlined style={{ fontSize: 16 }} />,
+  Edit:           () => <EditOutlined style={{ fontSize: 13 }} />,
+  Trash:          () => <DeleteOutlined style={{ fontSize: 13 }} />,
+  Users:          () => <TeamOutlined style={{ fontSize: 16 }} />,
+  UserPlus:       () => <UserAddOutlined style={{ fontSize: 15 }} />,
+  Plus:           () => <PlusOutlined style={{ fontSize: 15 }} />,
+  MessageSquare:  () => <MessageOutlined style={{ fontSize: 13 }} />,
+  ClipboardCheck: () => <AuditOutlined style={{ fontSize: 14 }} />,
+  Archive:        () => <InboxOutlined style={{ fontSize: 14 }} />,
+  ArrowRight:     () => <ArrowRightOutlined style={{ fontSize: 13 }} />,
+  LogOut:         () => <LogoutOutlined style={{ fontSize: 15 }} />,
+  Mail:           () => <MailOutlined style={{ fontSize: 16 }} />,
+  Check:          () => <CheckOutlined style={{ fontSize: 14 }} />,
+  X:              () => <CloseOutlined style={{ fontSize: 14 }} />,
+  Reply:          () => <RollbackOutlined style={{ fontSize: 14 }} />,
+  Crown:          () => <CrownOutlined style={{ fontSize: 12 }} />,
+  Ticket:         () => <TagOutlined style={{ fontSize: 16 }} />,
+  Inbox:          () => <InboxOutlined style={{ fontSize: 22 }} />,
 };
 
 const COLUMNS = [
@@ -623,7 +551,7 @@ function MembersDropdown({ members, projectData }) {
           )}
         </div>
         <span style={{ fontSize: 12, fontWeight: 600 }}>{members.length} member{members.length !== 1 ? 's' : ''}</span>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}><polyline points="6 9 12 15 18 9"/></svg>
+        <DownOutlined style={{ fontSize: 10, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
       </button>
 
       {open && (
@@ -688,10 +616,7 @@ function ProgressModal({ ticket, projectId, onDone, onClose }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${P.purple200}`, color: P.purple600 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
+          <CheckCircleOutlined style={{ fontSize: 16 }} />
           </div>
           <div>
             <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: '-.02em' }}>Update Progress</h2>
@@ -854,7 +779,7 @@ function TicketCard({ ticket, isOwner, userRole, qaRequired, projectId, onEdit, 
             style={{ flex: 1, padding: '6px 0', borderRadius: 8, border: `1px solid ${P.purple200}`, background: P.purple50, color: P.purple600, cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'all .15s' }}
             onMouseEnter={(e) => e.currentTarget.style.background = P.purple100}
             onMouseLeave={(e) => e.currentTarget.style.background = P.purple50}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <CheckCircleOutlined style={{ fontSize: 11 }} />
             Update Progress
           </button>
         )}
@@ -1054,7 +979,7 @@ function ProfileDropdown({ user, onLogout }) {
               onMouseEnter={(e) => e.currentTarget.style.background = "#fff5f5"}
               onMouseLeave={(e) => e.currentTarget.style.background = "none"}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <LogoutOutlined style={{ fontSize: 15 }} />
               Sign out
             </button>
           </div>
@@ -1166,7 +1091,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
             style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid transparent`, background: 'transparent', color: P.textSecondary, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s', fontSize: 18 }}
             onMouseEnter={(e) => { e.currentTarget.style.background = P.purple50; e.currentTarget.style.borderColor = P.purple200; e.currentTarget.style.color = P.purple600; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = P.textSecondary; }}>
-            {<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} 
+            <ArrowLeftOutlined style={{ fontSize: 16 }} /> 
           </button>
         </Tooltip>
 
