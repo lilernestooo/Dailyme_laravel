@@ -1,4 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {
+  FolderOutlined,
+  ClockCircleOutlined,
+  SafetyOutlined,
+  BellOutlined,
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
+import { LogoutOutlined } from '@ant-design/icons';
 import { KanbanBoardSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 import TaskHistory from './TaskHistory';
@@ -241,11 +251,11 @@ function TaskRow({ task, onEdit, onDelete, onDragStart }) {
         <div style={{ display: "flex", gap: 2, opacity: hover ? 1 : 0, transition: "opacity .15s" }}>
         <button onClick={() => onEdit(task)} title="Edit"
             style={{ background: P.purple100, border: "none", cursor: "pointer", borderRadius: 6, padding: "4px 7px", color: P.purple600, display: "flex", alignItems: "center" }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <EditOutlined style={{ fontSize: 13 }} />
           </button>
           <button onClick={() => onDelete(task.id)} title="Delete"
             style={{ background: "#fee2e2", border: "none", cursor: "pointer", borderRadius: 6, padding: "4px 7px", color: "#dc2626", display: "flex", alignItems: "center" }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            <DeleteOutlined style={{ fontSize: 13 }} />
           </button>
         </div>
       </td>
@@ -431,7 +441,7 @@ function ProfileDropdown({ user, onLogout }) {
               onMouseEnter={(e) => e.currentTarget.style.background = "#fff5f5"}
               onMouseLeave={(e) => e.currentTarget.style.background = "none"}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <LogoutOutlined style={{ fontSize: 15 }} />
               Sign out
             </button>
           </div>
@@ -557,14 +567,14 @@ export default function KanbanBoard({ user, onLogout, onGoToProjects, onGoToAdmi
 
         {/* Icon nav group */}
         <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <NavIcon icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>} label="Projects" onClick={() => onGoToProjects && onGoToProjects()} />
-          <NavIcon icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>} label="History" onClick={() => setShowHistory((v) => !v)} active={showHistory} badge={history.length} />
+        <NavIcon icon={<FolderOutlined style={{ fontSize: 16 }} />} label="Projects" onClick={() => onGoToProjects && onGoToProjects()} />
+        <NavIcon icon={<ClockCircleOutlined style={{ fontSize: 16 }} />} label="History" onClick={() => setShowHistory((v) => !v)} active={showHistory} badge={history.length} />
           {onGoToAdmin && (
             <NavIcon
-              icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>}
-              label="Admin Dashboard"
-              onClick={onGoToAdmin}
-            />
+            icon={<SafetyOutlined style={{ fontSize: 16 }} />}
+            label="Admin Dashboard"
+            onClick={onGoToAdmin}
+          />
           )}
           <Tooltip label="Notifications">
             <NotificationBell onOpenProject={onGoToProjects} />
@@ -586,7 +596,7 @@ export default function KanbanBoard({ user, onLogout, onGoToProjects, onGoToAdmi
           onMouseEnter={(e) => { e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = "translateY(-1px)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = P.purple600; e.currentTarget.style.transform = "translateY(0)"; }}
         >
-          <span style={{ fontSize: 16, fontWeight: 400 }}>+</span> New Task
+          <PlusOutlined /> New Task
         </button>
 
         <div style={{ width: 1, height: 22, background: P.border, margin: "0 4px" }} />
