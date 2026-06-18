@@ -1,4 +1,11 @@
 import React, { useState } from 'react';
+import {
+  CloseOutlined,
+  MessageOutlined,
+  CheckOutlined,
+  CloseCircleOutlined,
+  CommentOutlined,
+} from '@ant-design/icons';
 
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem('auth_token') || '';
@@ -60,9 +67,9 @@ export default function TicketDetail({ ticket, projectId, isOwner, onClose, onRe
   }
 
   function commentBadgeStyle(type) {
-    if (type === 'approve') return { bg: '#ecfdf5', border: '#a7f3d0', badge: '#10b981', label: 'Approved' };
-    if (type === 'reject')  return { bg: '#fee2e2', border: '#fca5a5', badge: '#ef4444', label: 'Rejected' };
-    return { bg: '#f9fafb', border: '#e5e7eb', badge: '#6b7280', label: 'Comment' };
+    if (type === 'approve') return { bg: '#ecfdf5', border: '#a7f3d0', badge: '#10b981', label: 'Approved', icon: <CheckOutlined style={{ fontSize: 10 }} /> };
+    if (type === 'reject')  return { bg: '#fee2e2', border: '#fca5a5', badge: '#ef4444', label: 'Rejected', icon: <CloseCircleOutlined style={{ fontSize: 10 }} /> };
+    return { bg: '#f9fafb', border: '#e5e7eb', badge: '#6b7280', label: 'Comment', icon: <CommentOutlined style={{ fontSize: 10 }} /> };
   }
 
   return (
@@ -85,7 +92,9 @@ export default function TicketDetail({ ticket, projectId, isOwner, onClose, onRe
                 </span>
               </div>
             </div>
-            <button onClick={onClose} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>✕ Close</button>
+            <button onClick={onClose} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 13, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <CloseOutlined style={{ fontSize: 12 }} /> Close
+          </button>
           </div>
 
           {/* Description */}
@@ -119,13 +128,13 @@ export default function TicketDetail({ ticket, projectId, isOwner, onClose, onRe
 
         {/* Comments list */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '20px 28px' }}>
-          <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '.05em' }}>
-            💬 Comments ({ticket.comments?.length || 0})
-          </h3>
+        <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '.05em', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <MessageOutlined style={{ fontSize: 13 }} /> Comments ({ticket.comments?.length || 0})
+        </h3>
 
           {!ticket.comments?.length ? (
             <div style={{ textAlign: 'center', padding: '32px 0', color: '#9ca3af' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>💬</div>
+              <CommentOutlined style={{ fontSize: 32, marginBottom: 8, color: '#9ca3af' }} />
               <p style={{ margin: 0, fontSize: 13 }}>No comments yet</p>
             </div>
           ) : (
@@ -141,8 +150,8 @@ export default function TicketDetail({ ticket, projectId, isOwner, onClose, onRe
                       <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{c.user?.name}</span>
                       <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 8 }}>{formatDate(c.created_at)}</span>
                     </div>
-                    <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 10, background: style.badge, color: '#fff', textTransform: 'uppercase' }}>
-                      {style.label}
+                    <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 10, background: style.badge, color: '#fff', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      {style.icon} {style.label}
                     </span>
                   </div>
                   <p style={{ margin: 0, fontSize: 14, color: '#374151', lineHeight: 1.5 }}>{c.comment}</p>

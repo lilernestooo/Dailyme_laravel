@@ -1,4 +1,11 @@
 import React from 'react';
+import {
+  CheckOutlined,
+  ArrowRightOutlined,
+  DeleteOutlined,
+  ClockCircleOutlined,
+  AuditOutlined,
+} from '@ant-design/icons';
 
 // ── Palette (matches DailyMe exactly) ─────────────────────────────────────
 const P = {
@@ -30,37 +37,11 @@ function LaravelLogo({ size = 18 }) {
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────
 const Icons = {
-  Check: () => (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12"/>
-    </svg>
-  ),
-  ArrowRight: () => (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="5" y1="12" x2="19" y2="12"/>
-      <polyline points="12 5 19 12 12 19"/>
-    </svg>
-  ),
-  Trash: () => (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 6 5 6 21 6"/>
-      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-      <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-    </svg>
-  ),
-  Clock: () => (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
-    </svg>
-  ),
-  ClipboardCheck: () => (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-      <rect x="9" y="3" width="6" height="4" rx="1" ry="1"/>
-      <path d="M9 12l2 2 4-4"/>
-    </svg>
-  ),
+  Check:          () => <CheckOutlined style={{ fontSize: 13 }} />,
+  ArrowRight:     () => <ArrowRightOutlined style={{ fontSize: 11 }} />,
+  Trash:          () => <DeleteOutlined style={{ fontSize: 13 }} />,
+  Clock:          () => <ClockCircleOutlined style={{ fontSize: 11 }} />,
+  ClipboardCheck: () => <AuditOutlined style={{ fontSize: 28 }} />,
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────
