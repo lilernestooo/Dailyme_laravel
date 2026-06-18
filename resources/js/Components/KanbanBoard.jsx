@@ -7,11 +7,20 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
+  TagOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
-import { LogoutOutlined } from '@ant-design/icons';
 import { KanbanBoardSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 import TaskHistory from './TaskHistory';
+
+const STYLE_ID = 'btn-spin-keyframes';
+if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
+  const style = document.createElement('style');
+  style.id = STYLE_ID;
+  style.textContent = `@keyframes btnSpin { to { transform: rotate(360deg); } }`;
+  document.head.appendChild(style);
+}
 
 const API = "/api/tasks";
 
@@ -459,6 +468,7 @@ export default function KanbanBoard({ user, onLogout, onGoToProjects, onGoToAdmi
   const [error, setError]             = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory]         = useState([]);
+  const [spin, setSpin]               = useState(false);
   const dragTask = useRef(null);
   const columnRefs = useRef({});
 
@@ -585,7 +595,9 @@ export default function KanbanBoard({ user, onLogout, onGoToProjects, onGoToAdmi
 
         {/* New task button */}
         <button
-          onClick={() => setModal({ task: null, defaultStatus: "todo" })}
+          onClick={() => { setModal({ task: null, defaultStatus: "todo" }); setSpin(true); setTimeout(() => setSpin(false), 600); }}
+          onMouseEnter={(e) => { setSpin(true); e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = "translateY(-1px)"; }}
+          onMouseLeave={(e) => { setSpin(false); e.currentTarget.style.background = P.purple600; e.currentTarget.style.transform = "translateY(0)"; }}
           style={{
             padding: "7px 16px", background: P.purple600, color: "#fff",
             border: "none", borderRadius: 9, cursor: "pointer",
@@ -593,10 +605,9 @@ export default function KanbanBoard({ user, onLogout, onGoToProjects, onGoToAdmi
             boxShadow: `0 2px 8px rgba(124,58,237,.3)`,
             transition: "all .2s", display: "flex", alignItems: "center", gap: 6,
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = "translateY(-1px)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = P.purple600; e.currentTarget.style.transform = "translateY(0)"; }}
         >
-          <PlusOutlined /> New Task
+          <TagOutlined style={{ fontSize: 14, display: 'inline-flex', animation: spin ? 'btnSpin 0.6s linear' : 'none' }} />
+          New Task
         </button>
 
         <div style={{ width: 1, height: 22, background: P.border, margin: "0 4px" }} />

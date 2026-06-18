@@ -24,6 +24,14 @@ import { KanbanBoardSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 import TicketDetail from './TicketDetail';
 
+const STYLE_ID = 'btn-spin-keyframes';
+if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
+  const style = document.createElement('style');
+  style.id = STYLE_ID;
+  style.textContent = '@keyframes btnSpin { to { transform: rotate(360deg); } }';
+  document.head.appendChild(style);
+}
+
 // ── Palette (matches KanbanBoard exactly) ─────────────────────────────────
 const P = {
   purple50:  '#f5f3ff',
@@ -1002,6 +1010,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
   const [progressModal, setProgressModal] = useState(null);
   const [error, setError]                 = useState(null);
   const [projectData, setProjectData]     = useState(project);
+  const [spin, setSpin]                   = useState(false); // ← add this
 
   const isOwner = project.is_owner || project.owner_id === user.id;
   const isQA    = !isOwner && members.some(m => m.user?.id === user.id && m.role === 'qa');
@@ -1117,12 +1126,14 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = P.border; e.currentTarget.style.color = P.textSecondary; }}>
               <Icons.UserPlus /> Invite
             </button>
-
-            <button onClick={() => setTicketModal({ ticket: null })}
+            <button
+              onClick={() => { setTicketModal({ ticket: null }); setSpin(true); setTimeout(() => setSpin(false), 600); }}
+              onMouseEnter={(e) => { setSpin(true); e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={(e) => { setSpin(false); e.currentTarget.style.background = P.purple600; e.currentTarget.style.transform = 'translateY(0)'; }}
               style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: P.purple600, color: '#fff', border: 'none', borderRadius: 9, cursor: 'pointer', fontWeight: 700, fontSize: 13, boxShadow: '0 2px 8px rgba(124,58,237,.3)', transition: 'all .2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = P.purple600; e.currentTarget.style.transform = 'translateY(0)'; }}>
-              <Icons.Plus /> New Ticket
+            >
+              <TagOutlined style={{ fontSize: 14, display: 'inline-flex', animation: spin ? 'btnSpin 0.6s linear' : 'none' }} />
+              New Ticket
             </button>
           </>
         )}
