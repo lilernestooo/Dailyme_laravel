@@ -7,6 +7,7 @@ import {
   LogoutOutlined,
   FolderOpenOutlined,
 } from '@ant-design/icons';
+import { Card } from 'antd';
 import { ProjectListPageSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 
@@ -390,14 +391,15 @@ function ProjectCard({ project, onOpen, onDelete }) {
   const isOwner = project.is_owner;
 
   return (
-    <div
+    <Card
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      bodyStyle={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 0 }}
       style={{
-        background: P.white, borderRadius: 16, padding: 22,
+        borderRadius: 16,
         border: hover ? `1px solid ${P.purple300}` : `1px solid ${P.border}`,
         boxShadow: hover ? '0 4px 24px rgba(124,58,237,.1)' : '0 1px 6px rgba(124,58,237,.05)',
-        transition: 'all .15s', display: 'flex', flexDirection: 'column', gap: 0,
+        transition: 'all .15s',
       }}
     >
       {/* Card header */}
@@ -474,6 +476,6 @@ function ProjectCard({ project, onOpen, onDelete }) {
           </button>
         )}
       </div>
-    </div>
+      </Card>
   );
 }
