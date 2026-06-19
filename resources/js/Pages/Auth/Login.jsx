@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Card } from 'antd';
 
 // ── Palette (matches DailyMe exactly) ─────────────────────────────────────
 const P = {
@@ -28,8 +29,8 @@ function LaravelLogo({ size = 28 }) {
   );
 }
 
-export default function Login({ onLogin, onGoToRegister }) {
-  const [form, setForm]       = useState({ email: '', password: '' });
+export default function Login({ onLogin, onGoToRegister, prefillEmail }) {
+  const [form, setForm]       = useState({ email: prefillEmail || '', password: '' });
   const [error, setError]     = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -85,15 +86,15 @@ export default function Login({ onLogin, onGoToRegister }) {
         <div style={{ position: 'absolute', top: '40%', left: '30%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(196,181,253,.06) 0%, transparent 70%)' }} />
       </div>
 
-      <div style={{
+      <Card style={{
         position: 'relative', zIndex: 1,
-        background: P.white,
         borderRadius: 24,
-        padding: '40px 36px',
         width: '100%', maxWidth: 420,
         boxShadow: '0 8px 40px rgba(124,58,237,.10), 0 1px 0 rgba(255,255,255,.8) inset',
         border: `1px solid ${P.purple200}`,
-      }}>
+      }}
+      styles={{ body: { padding: '40px 36px' } }}
+      >
 
         {/* Logo + title */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
@@ -198,7 +199,7 @@ export default function Login({ onLogin, onGoToRegister }) {
             Create one
           </span>
         </p>
-      </div>
+        </Card>
     </div>
   );
 }

@@ -13,6 +13,7 @@ function App() {
   const [checking, setChecking]           = useState(true);
   const [view, setView]                   = useState('daily');
   const [activeProject, setActiveProject] = useState(null);
+  const [prefillEmail, setPrefillEmail]   = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -49,8 +50,8 @@ function App() {
   );
 
   if (!user) {
-    if (page === 'register') return <Register onRegister={() => setPage('login')} onGoToLogin={() => setPage('login')} />;
-    return <Login onLogin={setUser} onGoToRegister={() => setPage('register')} />;
+    if (page === 'register') return <Register onRegister={() => setPage('login')} onGoToLogin={(email) => { setPrefillEmail(email || ''); setPage('login'); }} />;
+    return <Login onLogin={setUser} onGoToRegister={() => setPage('register')} prefillEmail={prefillEmail} />;
   }
 
   // ── Admin dashboard ──────────────────────────────────────────────────────

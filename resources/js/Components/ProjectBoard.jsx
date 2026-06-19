@@ -20,6 +20,7 @@ import {
   CheckCircleOutlined,
   DownOutlined,
 } from '@ant-design/icons';
+import { Card } from 'antd';
 import { KanbanBoardSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 import TicketDetail from './TicketDetail';
@@ -869,7 +870,10 @@ function TicketCard({ ticket, isOwner, userRole, qaRequired, projectId, onEdit, 
 // ── Column ─────────────────────────────────────────────────────────────────
 function BoardColumn({ column, tickets, isOwner, userRole, qaRequired, projectId, onEdit, onDelete, onReview, onMove, onViewComments, onViewDetail, onUpdateProgress, onAddClick }) {
   return (
-    <div style={{ minWidth: 290, flex: '0 0 290px', background: P.white, borderRadius: 16, border: `1px solid ${column.border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 6px rgba(124,58,237,.05)' }}>
+    <Card
+      bodyStyle={{ padding: 0, display: 'flex', flexDirection: 'column', flex: 1 }}
+      style={{ minWidth: 290, flex: '0 0 290px', borderRadius: 16, border: `1px solid ${column.border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 6px rgba(124,58,237,.05)' }}
+    >
       {/* Header */}
       <div style={{ padding: '13px 16px', background: column.light, borderBottom: `1px solid ${column.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 9, height: 9, borderRadius: '50%', background: column.color, flexShrink: 0 }} />
@@ -929,7 +933,7 @@ function BoardColumn({ column, tickets, isOwner, userRole, qaRequired, projectId
           </button>
         </div>
       )}*/}
-    </div>
+    </Card>
   );
 }
 
