@@ -10,6 +10,7 @@ import {
   TagOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
+import { Card } from 'antd';
 import { KanbanBoardSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
 import TaskHistory from './TaskHistory';
@@ -277,18 +278,19 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
   const [isDragOver, setIsDragOver] = useState(false);
 
   return (
-    <div
-      onDrop={(e) => { setIsDragOver(false); onDrop(e, column.key); }}
-      onDragOver={(e) => { onDragOver(e); setIsDragOver(true); }}
-      onDragLeave={() => setIsDragOver(false)}
-      style={{
-        flex: 1, minWidth: 300, background: P.white, borderRadius: 16,
-        border: isDragOver ? `2px solid ${column.color}` : `1px solid ${column.border}`,
-        boxShadow: isDragOver ? `0 0 0 4px ${column.light}` : "0 1px 6px rgba(124,58,237,.05)",
-        overflow: "hidden", transition: "border .15s, box-shadow .15s",
-        display: "flex", flexDirection: "column",
-      }}
-    >
+    <Card
+    onDrop={(e) => { setIsDragOver(false); onDrop(e, column.key); }}
+    onDragOver={(e) => { onDragOver(e); setIsDragOver(true); }}
+    onDragLeave={() => setIsDragOver(false)}
+    bodyStyle={{ padding: 0, display: 'flex', flexDirection: 'column', flex: 1 }}
+    style={{
+      flex: 1, minWidth: 300, borderRadius: 16,
+      border: isDragOver ? `2px solid ${column.color}` : `1px solid ${column.border}`,
+      boxShadow: isDragOver ? `0 0 0 4px ${column.light}` : "0 1px 6px rgba(124,58,237,.05)",
+      overflow: "hidden", transition: "border .15s, box-shadow .15s",
+      display: "flex", flexDirection: "column",
+    }}
+  >
       {/* Header */}
       <div style={{ padding: "13px 16px", background: column.light, borderBottom: `1px solid ${column.border}`, display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{ width: 9, height: 9, borderRadius: "50%", background: column.color, flexShrink: 0 }} />
@@ -334,7 +336,7 @@ function KanbanColumn({ column, tasks, onDrop, onDragOver, onDragStart, onDelete
           <span style={{ fontSize: 15, fontWeight: 700 }}>+</span> Add task
         </button>
       </div>*/}
-    </div>
+     </Card>
   );
 }
 
