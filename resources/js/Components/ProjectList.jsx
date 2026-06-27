@@ -10,14 +10,12 @@ import {
 import { Card } from 'antd';
 import { ProjectListPageSkeleton } from './Skeleton';
 import NotificationBell from './NotificationBell';
+import logo from '../assets/logo-dailyme(1).png';
 
-// ── Laravel Flame Logo ─────────────────────────────────────────────────────
-function LaravelLogo({ size = 28 }) {
+// ── DailyMe Logo ───────────────────────────────────────────────────────────
+function DailyMeLogo({ size = 28 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 50 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M49.626 11.564a.809.809 0 0 1 .028.209v10.250c0 .348-.188.670-.491.844l-8.610 4.968v9.836c0 .348-.188.670-.491.844l-17.953 10.356a.817.817 0 0 1-.114.050c-.013.005-.028.009-.042.012a.786.786 0 0 1-.213.028.786.786 0 0 1-.213-.028c-.016-.003-.030-.007-.045-.013a.818.818 0 0 1-.114-.049L.491 38.515A.981.981 0 0 1 0 37.671V6.885c0-.070.008-.140.028-.208.006-.020.015-.039.024-.059a.807.807 0 0 1 .068-.124c.012-.018.026-.035.040-.051a.809.809 0 0 1 .098-.091c.016-.013.031-.025.048-.035L9.310.192a.981.981 0 0 1 .981 0l9.025 5.208a.817.817 0 0 1 .049.031.808.808 0 0 1 .098.091.748.748 0 0 1 .040.051.826.826 0 0 1 .067.124c.010.020.018.039.025.059.019.068.028.138.028.208v19.420l7.491-4.324V11.773c0-.070.009-.140.028-.208.006-.020.015-.039.025-.059a.826.826 0 0 1 .067-.124.748.748 0 0 1 .040-.051.808.808 0 0 1 .098-.091.817.817 0 0 1 .049-.031l9.025-5.208a.981.981 0 0 1 .981 0l9.025 5.208c.017.010.033.022.049.035a.809.809 0 0 1 .098.091c.014.016.028.033.040.051a.826.826 0 0 1 .068.124c.009.020.018.039.023.059z" fill="#7c3aed"/>
-      <path d="M48.062 21.816l-7.491 4.324V16.308l7.491-4.324v9.832zM39.589 37.093L22.618 26.947v-9.836l16.971 9.836v10.146zM9.800 1.554L1.327 6.470 9.800 11.386l8.473-4.916L9.800 1.554zM1.327 7.832v29.430l16.971 9.800V17.230L1.327 7.832zM9.800 12.748v19.420l7.491-4.324V8.424L9.800 12.748z" fill="#7c3aed" opacity=".35"/>
-    </svg>
+    <img src={logo} alt="DailyMe" style={{ width: size, height: size, objectFit: 'contain' }} />
   );
 }
 
@@ -192,9 +190,7 @@ function ProjectModal({ onSave, onClose }) {
         onClick={(e) => e.stopPropagation()}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${P.purple200}` }}>
-            <LaravelLogo size={22} />
-          </div>
+          <DailyMeLogo size={50} />
           <div>
             <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: P.textPrimary, letterSpacing: '-.02em' }}>New Project</h2>
             <p style={{ margin: 0, fontSize: 12, color: P.textMuted }}>Create a new project board</p>
@@ -300,9 +296,7 @@ export default function ProjectList({ user, onOpenProject, onGoToDaily, onLogout
       }}>
         {/* Logo + brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 12 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: P.purple100, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${P.purple200}` }}>
-            <LaravelLogo size={18} />
-          </div>
+          <DailyMeLogo size={50} />
           <span style={{ fontWeight: 800, fontSize: 16, color: P.textPrimary, letterSpacing: '-.03em' }}>DailyMe</span>
         </div>
 

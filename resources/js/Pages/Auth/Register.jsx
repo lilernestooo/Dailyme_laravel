@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from 'antd';
+import logo from '../../assets/logo-dailyme(1).png';
 
 // ── Palette (matches DailyMe exactly) ─────────────────────────────────────
 const P = {
@@ -19,13 +20,10 @@ const P = {
   bg:            '#faf9ff',
 };
 
-// ── Laravel Flame Logo (purple, matches app) ───────────────────────────────
-function LaravelLogo({ size = 28 }) {
+// ── DailyMe Logo ───────────────────────────────────────────────────────────
+function DailyMeLogo({ size = 28 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 50 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M49.626 11.564a.809.809 0 0 1 .028.209v10.250c0 .348-.188.670-.491.844l-8.610 4.968v9.836c0 .348-.188.670-.491.844l-17.953 10.356a.817.817 0 0 1-.114.050c-.013.005-.028.009-.042.012a.786.786 0 0 1-.213.028.786.786 0 0 1-.213-.028c-.016-.003-.030-.007-.045-.013a.818.818 0 0 1-.114-.049L.491 38.515A.981.981 0 0 1 0 37.671V6.885c0-.070.008-.140.028-.208.006-.020.015-.039.024-.059a.807.807 0 0 1 .068-.124c.012-.018.026-.035.040-.051a.809.809 0 0 1 .098-.091c.016-.013.031-.025.048-.035L9.310.192a.981.981 0 0 1 .981 0l9.025 5.208a.817.817 0 0 1 .049.031.808.808 0 0 1 .098.091.748.748 0 0 1 .040.051.826.826 0 0 1 .067.124c.010.020.018.039.025.059.019.068.028.138.028.208v19.420l7.491-4.324V11.773c0-.070.009-.140.028-.208.006-.020.015-.039.025-.059a.826.826 0 0 1 .067-.124.748.748 0 0 1 .040-.051.808.808 0 0 1 .098-.091.817.817 0 0 1 .049-.031l9.025-5.208a.981.981 0 0 1 .981 0l9.025 5.208c.017.010.033.022.049.035a.809.809 0 0 1 .098.091c.014.016.028.033.040.051a.826.826 0 0 1 .068.124c.009.020.018.039.023.059z" fill="#7c3aed"/>
-      <path d="M48.062 21.816l-7.491 4.324V16.308l7.491-4.324v9.832zM39.589 37.093L22.618 26.947v-9.836l16.971 9.836v10.146zM9.800 1.554L1.327 6.470 9.800 11.386l8.473-4.916L9.800 1.554zM1.327 7.832v29.430l16.971 9.800V17.230L1.327 7.832zM9.800 12.748v19.420l7.491-4.324V8.424L9.800 12.748z" fill="#7c3aed" opacity=".35"/>
-    </svg>
+    <img src={logo} alt="DailyMe" style={{ width: size, height: size, objectFit: 'contain' }} />
   );
 }
 
@@ -124,15 +122,8 @@ export default function Register({ onGoToLogin }) {
 
         {/* Logo + title */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            width: 60, height: 60, borderRadius: 18,
-            background: P.purple100,
-            border: `1px solid ${P.purple200}`,
-            marginBottom: 16,
-            boxShadow: '0 4px 16px rgba(124,58,237,.12)',
-          }}>
-            <LaravelLogo size={32} />
+        <div style={{ marginBottom: 4 }}>
+            <DailyMeLogo size={72} />
           </div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: P.textPrimary, letterSpacing: '-.03em' }}>
             DailyMe
