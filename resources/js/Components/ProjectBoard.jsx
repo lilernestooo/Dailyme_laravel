@@ -1003,7 +1003,7 @@ function ProfileDropdown({ user, onLogout }) {
 
 // ── Main ProjectBoard ──────────────────────────────────────────────────────
 export default function ProjectBoard({ project, user, onBack, onLogout }) {
-  const [columns, setColumns]             = useState({ todo: [], in_progress: [], review: [], qa_approved: [], done: [], archived: [] });
+  const [columns, setColumns] = useState({ todo: [], in_progress: [], review: [], qa_approved: [], done: [], archived: [] });
   const [members, setMembers]             = useState([]);
   const [loading, setLoading]             = useState(true);
   const [ticketModal, setTicketModal]     = useState(null);
@@ -1181,7 +1181,7 @@ export default function ProjectBoard({ project, user, onBack, onLogout }) {
       {/* ── Board ───────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: 16, padding: '24px 28px 60px', alignItems: 'flex-start', overflowX: 'auto' }}>
 
-      {COLUMNS.map((col) => (
+      {COLUMNS.filter(col => col.key !== 'qa_approved' || projectData.qa_required).map((col) => (
           <BoardColumn
             key={col.key}
             column={col}
