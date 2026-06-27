@@ -245,9 +245,9 @@ export default function Register({ onGoToLogin }) {
           Already have an account?{' '}
           <span
             onClick={onGoToLogin}
-            style={{ color: P.purple600, fontWeight: 700, cursor: 'pointer', transition: 'color .15s' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = P.purple700}
-            onMouseLeave={(e) => e.currentTarget.style.color = P.purple600}
+            style={{ color: '#2563eb', fontWeight: 700, cursor: 'pointer', transition: 'color .15s', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#1d4ed8'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#2563eb'}
           >
             Sign In
           </span>
