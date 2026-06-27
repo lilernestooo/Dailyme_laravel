@@ -28,7 +28,7 @@ function DailyMeLogo({ size = 28 }) {
 }
 
 export default function Login({ onLogin, onGoToRegister, prefillEmail }) {
-  const [form, setForm]       = useState({ email: prefillEmail || '', password: '' });
+  const [form, setForm]       = useState({ email: typeof prefillEmail === 'string' ? prefillEmail : '', password: '' });
   const [error, setError]     = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
