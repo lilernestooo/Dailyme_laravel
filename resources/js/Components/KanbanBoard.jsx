@@ -35,21 +35,21 @@ function DailyMeLogo({ size = 28 }) {
 
 // ── Palette ────────────────────────────────────────────────────────────────
 const P = {
-  purple50:  '#f5f3ff',
-  purple100: '#ede9fe',
-  purple200: '#ddd6fe',
-  purple300: '#c4b5fd',
-  purple400: '#a78bfa',
-  purple500: '#8b5cf6',
-  purple600: '#7c3aed',
-  purple700: '#6d28d9',
+  purple50:  '#f0f9ff',
+  purple100: '#e0f2fe',
+  purple200: '#bae6fd',
+  purple300: '#7dd3fc',
+  purple400: '#38bdf8',
+  purple500: '#0ea5e9',
+  purple600: '#3b82f6',
+  purple700: '#2563eb',
   textPrimary:   '#1e1b4b',
   textSecondary: '#6b7280',
   textMuted:     '#9ca3af',
-  border:        '#ede9fe',
-  borderMid:     '#c4b5fd',
+  border:        '#e0f2fe',
+  borderMid:     '#7dd3fc',
   white:         '#ffffff',
-  bg:            '#faf9ff',
+  bg:            '#f8faff',
 };
 
 const COLUMNS = [
@@ -209,12 +209,12 @@ function TaskModal({ task, defaultStatus, onSave, onClose }) {
             Cancel
           </button>
           <button
-            onClick={() => valid && onSave(form)}
-            style={{ flex: 2, padding: "11px 0", borderRadius: 12, border: "none", background: valid ? P.purple600 : P.purple300, color: "#fff", cursor: valid ? "pointer" : "not-allowed", fontWeight: 700, fontSize: 14, boxShadow: valid ? `0 4px 16px rgba(124,58,237,.3)` : "none", transition: "all .2s" }}
-            onMouseEnter={(e) => { if (valid) e.currentTarget.style.background = P.purple700; }}
-            onMouseLeave={(e) => { if (valid) e.currentTarget.style.background = P.purple600; }}>
-            {task ? "Save Changes" : "Create Task"}
-          </button>
+          onClick={() => valid && onSave(form)}
+          style={{ flex: 2, padding: "11px 0", borderRadius: 12, border: "none", background: valid ? 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)' : '#93c5fd', color: "#fff", cursor: valid ? "pointer" : "not-allowed", fontWeight: 700, fontSize: 14, boxShadow: valid ? '0 4px 16px rgba(16,185,129,.3)' : "none", transition: "all .2s" }}
+          onMouseEnter={(e) => { if (valid) e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #059669 100%)'; }}
+          onMouseLeave={(e) => { if (valid) e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)'; }}>
+          {task ? "Save Changes" : "Create Task"}
+        </button>
         </div>
       </div>
     </div>
@@ -411,12 +411,12 @@ function ProfileDropdown({ user, onLogout }) {
         onClick={() => setOpen((v) => !v)}
         style={{
           width: 34, height: 34, borderRadius: "50%",
-          background: open ? P.purple600 : P.purple500,
-          border: open ? `2px solid ${P.purple300}` : "2px solid transparent",
+          background: open ? 'linear-gradient(135deg, #2563eb 0%, #059669 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
+          border: open ? '2px solid #86efac' : "2px solid transparent",
           display: "flex", alignItems: "center", justifyContent: "center",
           color: "#fff", fontWeight: 700, fontSize: 13,
           cursor: "pointer", transition: "all .15s",
-          boxShadow: open ? `0 0 0 3px ${P.purple100}` : "none",
+          boxShadow: open ? '0 0 0 3px #dcfce7' : "none",
         }}
       >
         {initial}
@@ -431,9 +431,9 @@ function ProfileDropdown({ user, onLogout }) {
         }}>
           {/* Profile header */}
           <div style={{ padding: "16px 16px 12px", borderBottom: `1px solid ${P.border}`, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 38, height: 38, borderRadius: "50%", background: P.purple500, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
-              {initial}
-            </div>
+          <div style={{ width: 38, height: 38, borderRadius: "50%", background: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)', display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
+            {initial}
+          </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 13.5, color: P.textPrimary }}>{user?.name || "User"}</div>
               <div style={{ fontSize: 11.5, color: P.textMuted }}>{user?.email || ""}</div>
@@ -591,20 +591,20 @@ export default function KanbanBoard({ user, onLogout, onGoToProjects, onGoToAdmi
 
         {/* New task button */}
         <button
-          onClick={() => { setModal({ task: null, defaultStatus: "todo" }); setSpin(true); setTimeout(() => setSpin(false), 600); }}
-          onMouseEnter={(e) => { setSpin(true); e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = "translateY(-1px)"; }}
-          onMouseLeave={(e) => { setSpin(false); e.currentTarget.style.background = P.purple600; e.currentTarget.style.transform = "translateY(0)"; }}
-          style={{
-            padding: "7px 16px", background: P.purple600, color: "#fff",
-            border: "none", borderRadius: 9, cursor: "pointer",
-            fontWeight: 700, fontSize: 13,
-            boxShadow: `0 2px 8px rgba(124,58,237,.3)`,
-            transition: "all .2s", display: "flex", alignItems: "center", gap: 6,
-          }}
-        >
-          <TagOutlined style={{ fontSize: 14, display: 'inline-flex', animation: spin ? 'btnSpin 0.6s linear' : 'none' }} />
-          New Task
-        </button>
+        onClick={() => { setModal({ task: null, defaultStatus: "todo" }); setSpin(true); setTimeout(() => setSpin(false), 600); }}
+        onMouseEnter={(e) => { setSpin(true); e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #059669 100%)'; e.currentTarget.style.transform = "translateY(-1px)"; }}
+        onMouseLeave={(e) => { setSpin(false); e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)'; e.currentTarget.style.transform = "translateY(0)"; }}
+        style={{
+          padding: "7px 16px", background: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)', color: "#fff",
+          border: "none", borderRadius: 9, cursor: "pointer",
+          fontWeight: 700, fontSize: 13,
+          boxShadow: '0 2px 8px rgba(16,185,129,.3)',
+          transition: "all .2s", display: "flex", alignItems: "center", gap: 6,
+        }}
+      >
+        <TagOutlined style={{ fontSize: 14, display: 'inline-flex', animation: spin ? 'btnSpin 0.6s linear' : 'none' }} />
+        New Task
+      </button>
 
         <div style={{ width: 1, height: 22, background: P.border, margin: "0 4px" }} />
 
