@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BellOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const P = {
-  purple50:  '#f5f3ff',
-  purple100: '#ede9fe',
-  purple200: '#ddd6fe',
-  purple300: '#c4b5fd',
-  purple500: '#8b5cf6',
-  purple600: '#7c3aed',
-  border:    '#ede9fe',
+  purple50:  '#f0f9ff',
+  purple100: '#e0f2fe',
+  purple200: '#bae6fd',
+  purple300: '#7dd3fc',
+  purple500: '#0ea5e9',
+  purple600: '#3b82f6',
+  border:    '#e0f2fe',
   textPrimary: '#1e1b4b',
   textMuted:   '#9ca3af',
 };
@@ -128,7 +128,7 @@ export default function NotificationBell({ onOpenProject }) {
           position: 'relative', width: 36, height: 36, borderRadius: 10,
           border: open ? `1.5px solid ${P.purple300}` : '1.5px solid transparent',
           background: open ? P.purple100 : 'transparent',
-          color: open ? P.purple600 : P.textMuted,
+          color: open ? '#3b82f6' : P.textMuted,
           cursor: 'pointer', display: 'flex', alignItems: 'center',
           justifyContent: 'center', transition: 'all .15s',
         }}
@@ -140,7 +140,7 @@ export default function NotificationBell({ onOpenProject }) {
           <span style={{
             position: 'absolute', top: 4, right: 4,
             width: 8, height: 8,
-            background: P.purple600, borderRadius: '50%',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)', borderRadius: '50%',
             border: '2px solid #fff',
           }} />
         )}
@@ -161,14 +161,14 @@ export default function NotificationBell({ onOpenProject }) {
             <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: P.textPrimary, flex: 1 }}>
               Notifications{' '}
               {unreadCount > 0 && (
-                <span style={{ fontSize: 11, background: P.purple600, color: '#fff', borderRadius: 10, padding: '1px 6px', marginLeft: 4 }}>
+                <span style={{ fontSize: 11, background: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)', color: '#fff', borderRadius: 10, padding: '1px 6px', marginLeft: 4 }}>
                   {unreadCount}
                 </span>
               )}
             </h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {unreadCount > 0 && (
-                <button onClick={markAllRead} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: P.purple600, fontWeight: 600, fontFamily: 'inherit' }}>
+                <button onClick={markAllRead} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#3b82f6', fontWeight: 600, fontFamily: 'inherit' }}>
                   Mark all read
                 </button>
               )}
@@ -204,12 +204,12 @@ export default function NotificationBell({ onOpenProject }) {
                     style={{
                       padding: '12px 18px', display: 'flex', gap: 12,
                       alignItems: 'flex-start', cursor: 'pointer',
-                      background: n.is_read ? '#fff' : P.purple50,
+                      background: n.is_read ? '#fff' : '#f0f9ff',
                       borderBottom: `1px solid ${P.border}`,
                       transition: 'background .12s',
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.background = P.purple50}
-                    onMouseLeave={(e) => e.currentTarget.style.background = n.is_read ? '#fff' : P.purple50}
+                    onMouseLeave={(e) => e.currentTarget.style.background = n.is_read ? '#fff' : '#f0f9ff'}
                   >
                     {/* Icon */}
                     <div style={{ width: 34, height: 34, borderRadius: 10, background: style.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
@@ -234,7 +234,7 @@ export default function NotificationBell({ onOpenProject }) {
                     {/* Unread dot + delete */}
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                       {!n.is_read && (
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: P.purple600 }} />
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)' }} />
                       )}
                       <button
                         onClick={(e) => deleteOne(e, n.id)}

@@ -55,7 +55,7 @@ const P = {
 const COLUMNS = [
   { key: "todo",        label: "To Do",       color: P.purple600, light: P.purple50,  dot: P.purple400, border: P.purple200 },
   { key: "in_progress", label: "In Progress",  color: "#0ea5e9",   light: "#f0f9ff",   dot: "#38bdf8",   border: "#bae6fd" },
-  { key: "done",        label: "Done",         color: "#10b981",   light: "#ecfdf5",   dot: "#34d399",   border: "#a7f3d0" },
+  { key: "done",        label: "Done",         color: "#0ea5e9",   light: "#f0f9ff",   dot: "#38bdf8",   border: "#bae6fd" },
 ];
 
 const PRIORITY = {
