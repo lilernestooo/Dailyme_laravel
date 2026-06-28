@@ -160,14 +160,14 @@ export default function Login({ onLogin, onGoToRegister, prefillEmail }) {
           onClick={handleSubmit} disabled={loading}
           style={{
             width: '100%', padding: '12px 0', borderRadius: 12, border: 'none',
-            background: loading ? P.purple300 : P.purple600,
+            background: loading ? 'linear-gradient(135deg, #93c5fd 0%, #6ee7b7 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
             color: '#fff', fontWeight: 700, fontSize: 15,
             cursor: loading ? 'not-allowed' : 'pointer',
-            boxShadow: loading ? 'none' : '0 4px 16px rgba(124,58,237,.30)',
+            boxShadow: loading ? 'none' : '0 4px 16px rgba(16,185,129,.30)',
             transition: 'all .2s', letterSpacing: '.01em',
           }}
-          onMouseEnter={(e) => { if (!loading) { e.currentTarget.style.background = P.purple700; e.currentTarget.style.transform = 'translateY(-1px)'; }}}
-          onMouseLeave={(e) => { e.currentTarget.style.background = loading ? P.purple300 : P.purple600; e.currentTarget.style.transform = 'translateY(0)'; }}
+          onMouseEnter={(e) => { if (!loading) { e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #059669 100%)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}}
+          onMouseLeave={(e) => { e.currentTarget.style.background = loading ? 'linear-gradient(135deg, #93c5fd 0%, #6ee7b7 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)'; e.currentTarget.style.transform = 'translateY(0)'; }}
         >
           {loading ? 'Signing in…' : 'Sign In →'}
         </button>
